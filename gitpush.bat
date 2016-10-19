@@ -3,3 +3,4 @@ git config remote.origin.url https://chalktalkimages:abcd123@github.com/chalktal
 git add -A
 git commit -am imagescommit
 git push
+pause
