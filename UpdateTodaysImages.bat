@@ -1,0 +1,1 @@
+java -jar \\t65-w7-eqcash\incoming\ChalkServer\UpdateTodaysImages.jar
