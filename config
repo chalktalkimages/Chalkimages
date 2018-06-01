@@ -1,0 +1,9 @@
+to=
+from=george.gardiner@scotiabank.com
+subject=Analyst/Trader Block Trade Report
+imageLoc=\\t65-w7-eqcash\incoming\ChalkServer\htmlBuild\images
+images=
+
+
+body=\\t65-w7-eqcash\incoming\ChalkServer\htmlBuild\BlockReportEmail.html
+bcc=
