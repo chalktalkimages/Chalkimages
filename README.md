@@ -1,4 +1,4 @@
-#ChalkServer Documentation
+##ChalkServer Documentation
 SVN Repo path: svn://svn.bns/equitytrading/trunk/PortfolioDesk/ChalkTalk
 Production path: \\t65-w7-eqcash\incoming\ChalkServer\htmlBuilder\ChalktalkServer-1.0.jar
 
@@ -19,7 +19,7 @@ o	Every time the site is accessed the connection might time out so it tries for 
 o	First the cookie for login into the site is saved, then it obtains the securities map (which maps ticker and exchange to a securityID). The URL for Scotiaview for each ticker is formed using the securityID
 o	The report builders initialize an instance of the parser, then for each stock on which there is a news item, it obtains the scotiaview information by calling the instance method getSymbolResearch (ric). Sometimes there is no research on for the ticker on the exchange specified by the ric, in which case we look to see if it is interlisted and check if the interlisted stock has research on scotiaview. If there is no research it just returns “N/A”
 
-Overview of Chalktalk Report Builder (ChalktalkReportBuilder.java, under html package)
+##Overview of Chalktalk Report Builder (ChalktalkReportBuilder.java, under html package)
 -	The other news report builders are very similar (or simpler) in design so will go through this one in detail
 -	Chad and Tim use this for their before open morning report (~845AM) after all the comments have been loaded on Flow
 -	The idea is that there is a main HTML (ChalktalkTemplate.html) which serves as the ‘frame’ of the report. The different sections/parts are placed in programmatically, and is denoted by curly brackets. For example {{bellImage}} is replaced by the actual location of the image.
