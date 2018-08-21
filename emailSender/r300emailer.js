@@ -59,7 +59,7 @@ endtime.setHours(0,0,0,0);
 
 queryObject.startdate = lastWeek;
 queryObject.enddate = endtime;
-queryObject.filters = [0, 1, 9, 11, 12, 13, 14, 17, 18 ];
+queryObject.filters = [0, 1, 9, 11, 12, 13, 14, 17, 18, 21 ];
 queryObject.aggregate = false;
 queryObject.user = 'bliu';
 

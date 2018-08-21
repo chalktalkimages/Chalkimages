@@ -63,7 +63,7 @@ else
 
 queryObject.startdate = yesterday;
 queryObject.enddate = yesterday;
-queryObject.filters = [0, 1, 8, 9, 11, 12, 13, 14, 17, 18 ];
+queryObject.filters = [0, 1, 8, 9, 11, 12, 13, 14, 17, 18, 21 ];
 
 queryObject.aggregate = false;
 queryObject.user = 'bliu';
