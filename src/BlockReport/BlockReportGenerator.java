@@ -402,10 +402,9 @@ public class BlockReportGenerator {
     ArrayList<BlockDetails> blocksNew = filterBlocks(blocks);
     ArrayList<BlockDetails> blocksWithName = new ArrayList<BlockDetails>();
 
-    Map<String, String> nameMap = new DBHandle().nameMap;
     for (BlockDetails block : blocksNew) {
-      if (nameMap.containsKey(block.ticker)) {
-        block.fullName = nameMap.get(block.ticker);
+      if (DBHandle.nameMap.containsKey(block.ticker)) {
+        block.fullName = DBHandle.nameMap.get(block.ticker);
       }
       blocksWithName.add(block);
     }

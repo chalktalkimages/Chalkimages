@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import adapter.EquityFileParser;
 import data.FlowStories;
 import data.PostTradeOptions;
 import data.TickerResearch;
@@ -159,5 +160,15 @@ public class ChalktalkController {
     if (!svp.isLoaded()) // reload if its not good
     svp = new ScotiaViewParser();
     return svp.getSymbolResearch(ric, ticker);
+  }
+  
+  @RequestMapping(
+		  value = "/refresh-coverage-list",
+		  method = RequestMethod.GET,
+		  headers = "Accept=application/json")
+  public @ResponseBody String refreshCoverageList(){
+	  EquityFileParser.load();
+	  int n = EquityFileParser.tickerResearchMap.size();
+	  return "Refreshed: " + n + " names.";
   }
 }

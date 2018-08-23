@@ -10,6 +10,9 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 
+import adapter.DBHandle;
+import adapter.EquityFileParser;
+import utils.Globals;
 import engine.Engine;
 
 @ComponentScan
@@ -22,6 +25,10 @@ public class Application {
     Engine.getInstance();
     springApp = SpringApplication.run(Application.class, args);
     logger.info("Chalktalk Spring app started");
+    
+    Globals.loadProperties();
+    new DBHandle();
+    new EquityFileParser();
 
     int nHour = 23;
     int nMin = 30;

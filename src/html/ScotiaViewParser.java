@@ -21,6 +21,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.util.StringUtils;
 
+import adapter.DBHandle;
+import adapter.EquityFileParser;
 import data.FlowStories;
 import data.SecInfo;
 import data.TickerResearch;
@@ -214,15 +216,26 @@ public class ScotiaViewParser {
   public TickerResearch getSymbolResearch(String ric, String ticker) {
     TickerResearch research = new TickerResearch();
     if (isLoaded()) {
-      research = getResearch(ric, ticker);
+    	if(EquityFileParser.tickerResearchMap.containsKey(ticker)){
+    		research = EquityFileParser.tickerResearchMap.get(ticker);
+    	}
+    	else{
+    		research = getResearch(ric, ticker);
+    	}
     }
 
     TickerResearch altResearch = null;
     if (research.target.equals("N/A") && loginsuccess && secMapsuccess) {
-      String altRIC = getAltRIC(ric);
+      String altRIC = DBHandle.getAltRIC(ric);
       if (!altRIC.equals("")) {
         String altTicker = SymbolConverter.getPrefix(SymbolConverter.RIC2Symbol(altRIC));
-        altResearch = getResearch(altRIC, altTicker);
+        
+        if(EquityFileParser.tickerResearchMap.containsKey(altTicker)){
+        	altResearch = EquityFileParser.tickerResearchMap.get(altTicker);
+        }
+        else{
+        	altResearch = getResearch(altRIC, altTicker);
+        }
 
         if (!altResearch.target.equals("N/A") || !altResearch.researchLink.equals("")) {
           research = altResearch;
@@ -283,50 +296,6 @@ public class ScotiaViewParser {
         }
       } else return new TickerResearch("N/A", "N/A", "");
     }
-  }
-
-  private String getAltRIC(String ric) {
-    java.sql.Connection connection = null;
-
-    String altRIC = "";
-
-    try {
-
-      String connectionString =
-          "jdbc:jtds:sqlserver://eessql.gss.scotia-capital.com:5150;"
-              + "user=dmamso;"
-              + "password=abc1234$6;";
-
-      connection = DriverManager.getConnection(connectionString);
-
-      Statement cmd = connection.createStatement();
-      String cmdString =
-          "SELECT [RIC] FROM [SecurityMaster].[dbo].[IEST_MSD_BASE] WHERE (([EQY_PRIM_EXCH] = 'CT' AND [REUTERS_SUFFIX] = 'TO') OR ([EQY_PRIM_EXCH] = 'CV' AND [REUTERS_SUFFIX] = 'V') OR ([EQY_PRIM_EXCH] = 'UN' AND [REUTERS_SUFFIX] = 'N') OR ([EQY_PRIM_EXCH] = 'UP' AND [REUTERS_SUFFIX] = 'P') OR ([EQY_PRIM_EXCH] = 'UQ' AND [REUTERS_SUFFIX] = 'O') OR ([EQY_PRIM_EXCH] = 'UR' AND [REUTERS_SUFFIX] = 'O') OR ([EQY_PRIM_EXCH] = 'UW' AND [REUTERS_SUFFIX] = 'O') OR ([EQY_PRIM_EXCH] = 'UA' AND [REUTERS_SUFFIX] = 'A')) AND [RIC] IS NOT NULL AND [ID_EXCH_SYMBOL] IS NOT NULL AND [ID_CUSIP]= (SELECT [ID_CUSIP] FROM [SecurityMaster].[dbo].[IEST_MSD_BASE] WHERE (([EQY_PRIM_EXCH] = 'CT' AND [REUTERS_SUFFIX] = 'TO') OR ([EQY_PRIM_EXCH] = 'CV' AND [REUTERS_SUFFIX] = 'V') OR ([EQY_PRIM_EXCH] = 'UN' AND [REUTERS_SUFFIX] = 'N') OR ([EQY_PRIM_EXCH] = 'UP' AND [REUTERS_SUFFIX] = 'P') OR ([EQY_PRIM_EXCH] = 'UQ' AND [REUTERS_SUFFIX] = 'O') OR ([EQY_PRIM_EXCH] = 'UR' AND [REUTERS_SUFFIX] = 'O') OR ([EQY_PRIM_EXCH] = 'UW' AND [REUTERS_SUFFIX] = 'O') OR ([EQY_PRIM_EXCH] = 'UA' AND [REUTERS_SUFFIX] = 'A')) AND [RIC] IS NOT NULL AND [ID_EXCH_SYMBOL] IS NOT NULL and RIC = "
-              + "'"
-              + ric
-              + "')"
-              + " and RIC != "
-              + "'"
-              + ric
-              + "'";
-      ResultSet rs = cmd.executeQuery(cmdString);
-
-      while (rs.next()) {
-        // ... get column values from this record
-        altRIC = rs.getString("RIC");
-      }
-    } catch (Exception e) {
-      // e.printStackTrace();
-      logger.info("Error: " + e.getMessage());
-    } finally {
-      if (connection != null)
-        try {
-          connection.close();
-        } catch (Exception e) {
-        }
-    }
-
-    return altRIC;
   }
 
   public List<FlowStories> getScotiaviewStories() {
