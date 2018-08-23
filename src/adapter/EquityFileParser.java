@@ -54,6 +54,8 @@ public class EquityFileParser extends TimerTask {
 			try{
 				Map<Integer, String> fileMap = new TreeMap<Integer, String>();
 				
+				// Add all filenames on the FTP to the TreeMap
+				// The TreeMap sorts values in ascending order
 				int i = 0;
 				for(Object file : channel.ls("/")){
 					ChannelSftp.LsEntry entry = (ChannelSftp.LsEntry) file;
@@ -63,23 +65,32 @@ public class EquityFileParser extends TimerTask {
 				
 				if(fileMap.size() > 0){
 					logger.info("Using " + fileMap.get(fileMap.size()) + " from SFTP.");
+					// Read the file with the most recent (largest) date
 					InputStream in = channel.get(fileMap.get(fileMap.size()));
 					BufferedReader br = new BufferedReader(new InputStreamReader(in));
 					String line;
+					int lineCounter = 0;
 					while((line = br.readLine()) != null){
-						String[] lineA = line.split(",");
-						String ticker = lineA[0].split("-")[0].replaceAll("\"", "");
-						String currency = lineA[1];
-						String target = lineA[2].replaceAll("\"", "");
-						String rating = lineA[3];
-						String analyst = lineA[4];
-						String researchLink = lineA[5];
-						if(currency.equals("CAD") || currency.equals("USD")){
-							TickerResearch tr = new TickerResearch();
-							tr.rating = rating;
-							tr.target = target;
-							tr.researchLink = researchLink;
-							tickerResearchMap.put(ticker, tr);
+						lineCounter++;
+						try{
+							String[] lineA = line.split(",");
+							String ticker = lineA[0].split("-")[0].replaceAll("\"", "");
+							String currency = lineA[1];
+							String target = lineA[2].replaceAll("\"", "");
+							String rating = lineA[3];
+							String analyst = lineA[4];
+							String researchLink = lineA[5];
+							if(currency.equals("CAD") || currency.equals("USD")){
+								TickerResearch tr = new TickerResearch();
+								tr.rating = rating;
+								tr.target = target;
+								tr.researchLink = researchLink;
+								tickerResearchMap.put(ticker, tr);
+							}
+						}
+						catch(Exception e){
+							logger.warn("Failed on line " + lineCounter);
+							logger.error(e);
 						}
 					}
 				}
@@ -129,14 +140,6 @@ public class EquityFileParser extends TimerTask {
 		}
 		
 	}
-	
-	/*
-	public static void main(String args[]){
-		refresh();
-	}
-	*/
-	
-	
 	
 
 }
