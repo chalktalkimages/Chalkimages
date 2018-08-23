@@ -25,7 +25,7 @@ public class Application {
     Engine.getInstance();
     springApp = SpringApplication.run(Application.class, args);
     logger.info("Chalktalk Spring app started");
-    
+
     Globals.loadProperties();
     new DBHandle();
     new EquityFileParser();

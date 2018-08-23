@@ -161,14 +161,14 @@ public class ChalktalkController {
     svp = new ScotiaViewParser();
     return svp.getSymbolResearch(ric, ticker);
   }
-  
+
   @RequestMapping(
-		  value = "/refresh-coverage-list",
-		  method = RequestMethod.GET,
-		  headers = "Accept=application/json")
-  public @ResponseBody String refreshCoverageList(){
-	  EquityFileParser.load();
-	  int n = EquityFileParser.tickerResearchMap.size();
-	  return "Refreshed: " + n + " names.";
+      value = "/refresh-coverage-list",
+      method = RequestMethod.GET,
+      headers = "Accept=application/json")
+  public @ResponseBody String refreshCoverageList() {
+    EquityFileParser.load();
+    int n = EquityFileParser.tickerResearchMap.size();
+    return "Refreshed: " + n + " names.";
   }
 }

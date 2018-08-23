@@ -216,12 +216,11 @@ public class ScotiaViewParser {
   public TickerResearch getSymbolResearch(String ric, String ticker) {
     TickerResearch research = new TickerResearch();
     if (isLoaded()) {
-    	if(EquityFileParser.tickerResearchMap.containsKey(ticker)){
-    		research = EquityFileParser.tickerResearchMap.get(ticker);
-    	}
-    	else{
-    		research = getResearch(ric, ticker);
-    	}
+      if (EquityFileParser.tickerResearchMap.containsKey(ticker)) {
+        research = EquityFileParser.tickerResearchMap.get(ticker);
+      } else {
+        research = getResearch(ric, ticker);
+      }
     }
 
     TickerResearch altResearch = null;
@@ -229,12 +228,11 @@ public class ScotiaViewParser {
       String altRIC = DBHandle.getAltRIC(ric);
       if (!altRIC.equals("")) {
         String altTicker = SymbolConverter.getPrefix(SymbolConverter.RIC2Symbol(altRIC));
-        
-        if(EquityFileParser.tickerResearchMap.containsKey(altTicker)){
-        	altResearch = EquityFileParser.tickerResearchMap.get(altTicker);
-        }
-        else{
-        	altResearch = getResearch(altRIC, altTicker);
+
+        if (EquityFileParser.tickerResearchMap.containsKey(altTicker)) {
+          altResearch = EquityFileParser.tickerResearchMap.get(altTicker);
+        } else {
+          altResearch = getResearch(altRIC, altTicker);
         }
 
         if (!altResearch.target.equals("N/A") || !altResearch.researchLink.equals("")) {
