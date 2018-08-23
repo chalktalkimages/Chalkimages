@@ -59,7 +59,7 @@ lastYear.setDate(1);
 
 queryObject.startdate = lastYear;
 queryObject.enddate = '';
-queryObject.filters = [0, 1, 9, 11, 12, 13, 14, 17, 18 ];
+queryObject.filters = [0, 1, 9, 11, 12, 13, 14, 17, 18, 21 ];
 queryObject.aggregate = false;
 queryObject.user = 'bliu';
 
