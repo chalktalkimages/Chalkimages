@@ -87,10 +87,27 @@ public class EquityFileParser extends TimerTask {
           InputStream in = channel.get(fileMap.get(fileMap.size()));
           BufferedReader br = new BufferedReader(new InputStreamReader(in));
 
+          // Parse the csv file
+          CSVParser fileParser = new CSVParser(br, CSVFormat.RFC4180);
+          
+          // Track number of occurrences of each story
+          Iterator<CSVRecord> preIterator = fileParser.iterator();
+          HashMap<String, Integer> storyCounter = new HashMap<String, Integer>();
+          while (preIterator.hasNext()){
+        	  CSVRecord record = preIterator.next();
+        	  String headline = record.get(6);
+        	  if(storyCounter.containsKey(headline)){
+        		  storyCounter.put(headline, storyCounter.get(headline).intValue()+1);
+        	  }
+        	  else{
+        		  storyCounter.put(headline, 1);
+        	  }
+          }
+          
+          // Re-populate tickerResearchMap and flowStoryList
+          Iterator<CSVRecord> fileIterator = fileParser.iterator();
           flowStoryList.clear(); // Clear the list before
           // re-populating
-          CSVParser fileParser = new CSVParser(br, CSVFormat.RFC4180);
-          Iterator<CSVRecord> fileIterator = fileParser.iterator();
           int lineCounter = 0;
           while (fileIterator.hasNext()) {
             lineCounter++;
@@ -111,7 +128,8 @@ public class EquityFileParser extends TimerTask {
 
               String story = record.get(8);
 
-              if (currency.equals("CAD") || currency.equals("USD")) {
+              // Only keep CAD, USD stories with frequency <= 3
+              if ((currency.equals("CAD") || currency.equals("USD")) && (storyCounter.get(headline) <= 3)) {
                 TickerResearch tr = new TickerResearch();
                 tr.rating = rating;
                 tr.target = target;
@@ -179,8 +197,4 @@ public class EquityFileParser extends TimerTask {
     }
   }
 
-  public static void main(String[] args) {
-    Globals.loadProperties();
-    load();
-  }
 }
