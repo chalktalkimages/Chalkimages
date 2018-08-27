@@ -24,7 +24,7 @@ public class Globals {
 
     try {
 
-      input = new FileInputStream("resources/config.properties");
+      input = new FileInputStream("config.properties");
       prop.load(input);
 
       Enumeration<?> e = prop.propertyNames();
