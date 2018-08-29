@@ -86,15 +86,15 @@ public class EquityFileParser extends TimerTask {
           // Read the file with the most recent (largest) date
           InputStream in = channel.get(fileMap.get(fileMap.size()));
           BufferedReader br = new BufferedReader(new InputStreamReader(in));
-
-          // Parse the csv file
           CSVParser fileParser = new CSVParser(br, CSVFormat.RFC4180);
+          List<CSVRecord> records = fileParser.getRecords();
+          fileParser.close();
           
           // Track number of occurrences of each story
-          Iterator<CSVRecord> preIterator = fileParser.iterator();
+          Iterator<CSVRecord> fileIterator = records.iterator();
           HashMap<String, Integer> storyCounter = new HashMap<String, Integer>();
-          while (preIterator.hasNext()){
-        	  CSVRecord record = preIterator.next();
+          while (fileIterator.hasNext()){
+        	  CSVRecord record = fileIterator.next();
         	  String headline = record.get(6);
         	  if(storyCounter.containsKey(headline)){
         		  storyCounter.put(headline, storyCounter.get(headline).intValue()+1);
@@ -104,11 +104,12 @@ public class EquityFileParser extends TimerTask {
         	  }
           }
           
+          
           // Re-populate tickerResearchMap and flowStoryList
-          Iterator<CSVRecord> fileIterator = fileParser.iterator();
-          flowStoryList.clear(); // Clear the list before
-          // re-populating
+          fileIterator = records.iterator();
+          flowStoryList.clear();
           int lineCounter = 0;
+          
           while (fileIterator.hasNext()) {
             lineCounter++;
             try {
@@ -155,6 +156,7 @@ public class EquityFileParser extends TimerTask {
               logger.error(e);
             }
           }
+          
 
         } else {
           logger.warn("No coverage list file found on SFTP!");

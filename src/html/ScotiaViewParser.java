@@ -301,6 +301,7 @@ public class ScotiaViewParser {
   public List<FlowStories> getScotiaviewStories() {
 
     if (EquityFileParser.flowStoryList.size() > 0) {
+      logger.info("Using cached list");	
       return EquityFileParser.flowStoryList;
     } else {
       List<FlowStories> results = getStories(lastestResearchURL1);
