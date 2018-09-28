@@ -15,6 +15,7 @@ public class Globals {
   public static String SFTP_host;
   public static String SFTP_username;
   public static String SFTP_password;
+  public static String IOI_path;
 
   public static void loadProperties() {
 
@@ -37,6 +38,7 @@ public class Globals {
       SFTP_host = prop.getProperty("SFTP_host", "66.155.100.247");
       SFTP_username = prop.getProperty("SFTP_username", "ScotiaTrading_UAT");
       SFTP_password = prop.getProperty("SFTP_password", "123456Trade!");
+      IOI_path = prop.getProperty("IOI_path", "http://t65-w7-eqcash:8001/");
 
     } catch (IOException ex) {
       ex.printStackTrace();

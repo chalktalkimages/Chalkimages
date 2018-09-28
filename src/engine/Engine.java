@@ -30,6 +30,7 @@ import html.ChalktalkReportBuilder;
 import html.ClosingReportBuilder;
 import html.EnergyInsightsReportBuilder;
 import html.EnergyReportBuilder;
+import html.GeoffMorningReportBuilder;
 import html.HalftimeReportBuilder;
 import html.MaterialsReportBuilder;
 import html.MiningScoopReportBuilder;
@@ -297,6 +298,8 @@ public class Engine {
 
     } else if (reportType == 8) {
       MiningScoopReportBuilder.buildReport(user.getFullname(), comments);
+    } else if (reportType == 9) {
+      GeoffMorningReportBuilder.buildReport(user.getFullname(), comments);
     }
   }
 
