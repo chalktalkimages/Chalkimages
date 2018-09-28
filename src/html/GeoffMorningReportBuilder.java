@@ -105,8 +105,12 @@ public class GeoffMorningReportBuilder {
         String ticker = ioi.getString("tickerPrefix");
         Double price = ioi.getDouble("limit");
         price = Math.round(price * 100.0) / 100.0;
+        if (ticker.toLowerCase().contains(".PR".toLowerCase())
+            || ticker.toLowerCase().contains(".DB".toLowerCase())) continue;
         if (price > 0.0) {
           list += ticker + " ($" + price.toString() + "), ";
+        } else {
+          list += ticker + ", ";
         }
       }
       list = list.replaceAll(", $", "");
