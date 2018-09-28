@@ -27,7 +27,7 @@ public class GeoffMorningReportBuilder {
 
   public static void buildReport(String fullName, ArrayList<CommentDetails> comments) {
     name = fullName;
-    String fileSave = "GeoffMorningReport.html";
+    String fileSave = "ChalkTalkEmail.html";
     String htmlSignature = Utilities.getHTMLString("GeoffDarlingSignature.html");
     String body = Utilities.getHTMLString("GeoffMorningReportTemplate.html");
     String formattedDate = (new SimpleDateFormat("EEEE, MMMM d, yyyy")).format(new Date());
