@@ -153,7 +153,7 @@ public class GeoffMorningReportBuilder {
                   .replace(
                       "{{target}}",
                       research.target.indexOf("$") == -1 ? "$" + research.target : research.target)
-                  .replace("{{research}}", research.researchLink)
+                  .replace("{{researchLink}}", research.researchLink)
                   .replace("{{sentiment}}", sentiment);
           ;
           result = result + temp + "\n";
