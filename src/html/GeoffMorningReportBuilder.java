@@ -53,7 +53,7 @@ public class GeoffMorningReportBuilder {
     }
 
     try {
-      Utilities.updateEmailRecipients(fullName, "Scotiabank Chalk Talk");
+      Utilities.updateEmailRecipients(fullName, "Morning Notes");
     } catch (IOException e) {
       logger.info("Error sending email: " + e.getMessage() + "\n");
     }
