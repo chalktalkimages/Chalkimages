@@ -14,8 +14,11 @@ import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import adapter.FlowAdapter;
 import adapter.MailRequest;
+import data.Comment;
 import data.CommentDetails;
+import data.GeneralComment;
 import data.TickerResearch;
 import engine.Engine;
 import utils.Globals;
@@ -25,8 +28,14 @@ public class GeoffMorningReportBuilder {
   private static final Logger logger = Logger.getLogger(ChalktalkReportBuilder.class.getName());
   private static String name = "";
 
-  public static void buildReport(String fullName, ArrayList<CommentDetails> comments) {
+  public static void buildReport(
+      String fullName,
+      ArrayList<CommentDetails> comments,
+      ArrayList<GeneralComment> generalComments,
+      ArrayList<String> reportSections) {
     name = fullName;
+    ArrayList<Comment> bellmacroindexcomments = FlowAdapter.getComments();
+    String macroComments = getMacroComments(generalComments);
     String fileSave = "ChalkTalkEmail.html";
     String htmlSignature = Utilities.getHTMLString("GeoffDarlingSignature.html");
     String body = Utilities.getHTMLString("GeoffMorningReportTemplate.html");
@@ -34,12 +43,34 @@ public class GeoffMorningReportBuilder {
     String buyList = getIOItradelist("buy");
     String sellList = getIOItradelist("sell");
     String morningIndications = getMorningIndications(buyList, sellList);
-    String namesNews = getNotableNews(comments);
+
+    if (!Utilities.sectionIncluded(reportSections, "Macro Commentary")) {
+      body = body.replace("{{MacroCommentary}}", "");
+    } else {
+      boolean found = false;
+
+      for (Comment comment : bellmacroindexcomments) {
+        if (comment.RIC().equals("MacroComment")) {
+          found = true;
+          break;
+        }
+      }
+      if (found)
+        body = body.replace("{{MacroCommentary}}", Utilities.getHTMLString("MacroCommentary.html"));
+      else body = body.replace("{{MacroCommentary}}", "");
+    }
+
+    if (!Utilities.sectionIncluded(reportSections, "Names in the News")) {
+      body = body.replace("{{NamesInTheNews}}", "");
+    } else {
+      body = body.replace("{{NamesInTheNews}}", Utilities.getHTMLString("GeoffNamesNews.html"));
+    }
 
     body =
         body.replace("{{formattedDateTime}}", formattedDate)
             .replace("{{MorningIndications}}", morningIndications)
-            .replace("{{NamesNews}}", namesNews)
+            .replace("{{macroComments}}", macroComments)
+            .replace("{{SectorSymbolComments}}", getNotableNews(comments))
             .replace("{{emailSignature}}", htmlSignature);
 
     body = Utilities.replaceOddCharacters(body);
@@ -92,7 +123,7 @@ public class GeoffMorningReportBuilder {
   public static String getNotableNews(ArrayList<CommentDetails> comments) {
     String result = "";
     String temp = "";
-    String sectorSymbolComment = Utilities.getHTMLString("GeoffNamesNews.html");
+    String sectorSymbolComment = Utilities.getHTMLString("GeoffSectorSymbolComments.html");
     Map<String, ArrayList<CommentDetails>> sectorComments = getSectorCommentMap(comments);
 
     Set<String> sectors = sectorComments.keySet();
@@ -185,5 +216,36 @@ public class GeoffMorningReportBuilder {
       sectorComments.put(sector, currSectorComments);
     }
     return sectorComments;
+  }
+
+  public static String getMacroComments(ArrayList<GeneralComment> comments) {
+
+    String result = "";
+    String temp = "";
+    String macroComment = Utilities.getHTMLString("MacroComment.html");
+
+    for (GeneralComment comment : comments) {
+      temp = macroComment;
+
+      if (comment.belongsTo() == null) {
+        temp = temp.replace("{{belongsTo}}", " ");
+      } else {
+        temp = temp.replace("{{belongsTo}}", comment.belongsTo());
+      }
+      if (comment.body() == null) {
+        temp = temp.replace("{{body}}", " ");
+      } else {
+        temp = temp.replace("{{body}}", Utilities.parseQuoteComment(comment.body(), false, true));
+      }
+      if (comment.link() != null && !comment.link().equals("") && !comment.link().equals("null")) {
+        temp =
+            temp.replace(
+                "{{link}}", " <a href=\"{rLink}\">Link</a>".replace("{rLink}", comment.link()));
+      } else {
+        temp = temp.replace("{{link}}", "");
+      }
+      result = result + temp + "\n";
+    }
+    return result;
   }
 }

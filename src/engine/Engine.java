@@ -299,7 +299,8 @@ public class Engine {
     } else if (reportType == 8) {
       MiningScoopReportBuilder.buildReport(user.getFullname(), comments);
     } else if (reportType == 9) {
-      GeoffMorningReportBuilder.buildReport(user.getFullname(), comments);
+      GeoffMorningReportBuilder.buildReport(
+          user.getFullname(), comments, generalComments, reportSections);
     }
   }
 
