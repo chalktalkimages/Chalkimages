@@ -1,7 +1,6 @@
 package html;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -15,12 +14,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import adapter.FlowAdapter;
-import adapter.MailRequest;
 import data.Comment;
 import data.CommentDetails;
 import data.GeneralComment;
 import data.TickerResearch;
-import engine.Engine;
 import utils.Globals;
 import utils.SymbolConverter;
 
@@ -36,20 +33,54 @@ public class GeoffMorningReportBuilder {
     name = fullName;
     ArrayList<Comment> bellmacroindexcomments = FlowAdapter.getComments();
     String macroComments = getMacroComments(generalComments);
-    String fileSave = "ChalkTalkEmail.html";
+    String fileSave = System.getProperty("user.dir") + "\\templates\\" + "ChalkTalkEmail.html";
     String htmlSignature = Utilities.getHTMLString("GeoffDarlingSignature.html");
     String body = Utilities.getHTMLString("GeoffMorningReportTemplate.html");
     String formattedDate = (new SimpleDateFormat("EEEE, MMMM d, yyyy")).format(new Date());
     String buyList = getIOItradelist("buy");
     String sellList = getIOItradelist("sell");
     String morningIndications = getMorningIndications(buyList, sellList);
+    String indexComments = buildIndexComments(bellmacroindexcomments);
+    body = includeSelectedSections(reportSections, body, bellmacroindexcomments);
 
+    body =
+        body.replace("{{formattedDateTime}}", formattedDate)
+            .replace("{{MorningIndications}}", morningIndications)
+            .replace("{{macroComments}}", macroComments)
+            .replace("{{SectorSymbolComments}}", getNotableNews(comments))
+            .replace("{{indexComments}}", indexComments)
+            .replace("{{emailSignature}}", htmlSignature);
+
+    body = Utilities.replaceOddCharacters(body);
+
+    try (PrintWriter out = new PrintWriter(fileSave)) {
+      out.println(body);
+      logger.info("Template Printed to: " + fileSave + "\n");
+
+    } catch (FileNotFoundException e) {
+      logger.info("Error writing html to file: " + e.getMessage() + "\n");
+    }
+
+    //    try {
+    //      Utilities.updateEmailRecipients(fullName, "Morning Notes");
+    //    } catch (IOException e) {
+    //      logger.info("Error sending email: " + e.getMessage() + "\n");
+    //    }
+    //
+    //    MailRequest.sendRequest();
+    //
+    //    Engine.getInstance().serverStatus.remove(fullName);
+  }
+
+  public static String includeSelectedSections(
+      ArrayList<String> reportSections, String htmlTemplate, ArrayList<Comment> comments) {
+    String body = htmlTemplate;
     if (!Utilities.sectionIncluded(reportSections, "Macro Commentary")) {
       body = body.replace("{{MacroCommentary}}", "");
     } else {
       boolean found = false;
 
-      for (Comment comment : bellmacroindexcomments) {
+      for (Comment comment : comments) {
         if (comment.RIC().equals("MacroComment")) {
           found = true;
           break;
@@ -66,32 +97,57 @@ public class GeoffMorningReportBuilder {
       body = body.replace("{{NamesInTheNews}}", Utilities.getHTMLString("GeoffNamesNews.html"));
     }
 
-    body =
-        body.replace("{{formattedDateTime}}", formattedDate)
-            .replace("{{MorningIndications}}", morningIndications)
-            .replace("{{macroComments}}", macroComments)
-            .replace("{{SectorSymbolComments}}", getNotableNews(comments))
-            .replace("{{emailSignature}}", htmlSignature);
+    if (!Utilities.sectionIncluded(reportSections, "Index Events")) {
+      body = body.replace("{{IndexEvents}}", "");
+    } else {
+      boolean found = false;
 
-    body = Utilities.replaceOddCharacters(body);
-
-    try (PrintWriter out = new PrintWriter(fileSave)) {
-      out.println(body);
-      logger.info("Template Printed to: " + fileSave + "\n");
-
-    } catch (FileNotFoundException e) {
-      logger.info("Error writing html to file: " + e.getMessage() + "\n");
+      for (Comment comment : comments) {
+        if (comment.RIC().equals("IndexComment")) {
+          found = true;
+          break;
+        }
+      }
+      if (found)
+        body = body.replace("{{IndexEvents}}", Utilities.getHTMLString("IndexEvents.html"));
+      else body = body.replace("{{IndexEvents}}", "");
     }
+    return body;
+  }
 
-    try {
-      Utilities.updateEmailRecipients(fullName, "Morning Notes");
-    } catch (IOException e) {
-      logger.info("Error sending email: " + e.getMessage() + "\n");
+  public static String buildIndexComments(ArrayList<Comment> comments) {
+
+    String result = "";
+    String temp = "";
+    String indexComment = Utilities.getHTMLString("MacroComment.html");
+
+    for (Comment comment : comments) {
+      if (comment.RIC().equals("IndexComment")) { // indicates index comment
+        temp = indexComment;
+        if (comment.belongsTo() == null) {
+          temp = temp.replace("{{belongsTo}}", " ");
+        } else {
+          temp = temp.replace("{{belongsTo}}", comment.belongsTo());
+        }
+        if (comment.body() == null) {
+          temp = temp.replace("{{body}}", " ");
+        } else {
+          temp = temp.replace("{{body}}", Utilities.parseQuoteComment(comment.body(), false, true));
+        }
+        if (comment.link() != null
+            && !comment.link().equals("")
+            && !comment.link().equals("null")) {
+          temp =
+              temp.replace(
+                  "{{link}}", " <a href=\"{rLink}\">Link</a>".replace("{rLink}", comment.link()));
+        } else {
+          temp = temp.replace("{{link}}", "");
+        }
+
+        result = result + temp + "\n";
+      }
     }
-
-    MailRequest.sendRequest();
-
-    Engine.getInstance().serverStatus.remove(fullName);
+    return result;
   }
 
   private static String getIOItradelist(String side) {
