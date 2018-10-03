@@ -36,7 +36,7 @@ public class GeoffMorningReportBuilder {
     name = fullName;
     ArrayList<Comment> bellmacroindexcomments = FlowAdapter.getComments();
     String macroComments = getMacroComments(generalComments);
-    String fileSave = System.getProperty("user.dir") + "\\templates\\" + "ChalkTalkEmail.html";
+    String fileSave = "ChalkTalkEmail.html";
     String htmlSignature = Utilities.getHTMLString("GeoffDarlingSignature.html");
     String body = Utilities.getHTMLString("GeoffMorningReportTemplate.html");
     String formattedDate = (new SimpleDateFormat("EEEE, MMMM d, yyyy")).format(new Date());
