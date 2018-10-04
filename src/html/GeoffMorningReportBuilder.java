@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -237,13 +238,19 @@ public class GeoffMorningReportBuilder {
               sentiment += "<font color='#ed1b2e'>-ve</font> ";
             }
           }
+          if (research.target.contains(".00")) {
+            research.target = research.target.replace(".00", "");
+          }
           temp =
               temp.replace("{{ticker}}", ticker)
                   .replace(
                       "{{body}}",
                       Utilities.formatSentiment(comment)
                           + Utilities.parseQuoteComment(comment.body(), false, true))
-                  .replace("{{rating}}", research.rating)
+                  .replace(
+                      "{{rating}}",
+                      getFirstLetters(
+                          new ArrayList<String>(Arrays.asList(research.rating.split(" ")))))
                   .replace(
                       "{{target}}",
                       research.target.indexOf("$") == -1 ? "$" + research.target : research.target)
@@ -310,5 +317,13 @@ public class GeoffMorningReportBuilder {
       result = result + temp + "\n";
     }
     return result;
+  }
+
+  public static String getFirstLetters(ArrayList<String> text) {
+    String firstLetters = "";
+    for (String s : text) {
+      firstLetters += s.charAt(0);
+    }
+    return firstLetters;
   }
 }
