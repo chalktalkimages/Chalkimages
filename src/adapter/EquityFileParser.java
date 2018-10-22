@@ -5,10 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -18,14 +16,10 @@ import java.util.TimerTask;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.catalina.filters.CsrfPreventionFilter;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.log4j.Logger;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import utils.Globals;
 
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
@@ -35,6 +29,7 @@ import com.jcraft.jsch.SftpException;
 
 import data.FlowStories;
 import data.TickerResearch;
+import utils.Globals;
 
 public class EquityFileParser extends TimerTask {
 
@@ -89,27 +84,25 @@ public class EquityFileParser extends TimerTask {
           CSVParser fileParser = new CSVParser(br, CSVFormat.RFC4180);
           List<CSVRecord> records = fileParser.getRecords();
           fileParser.close();
-          
+
           // Track number of occurrences of each story
           Iterator<CSVRecord> fileIterator = records.iterator();
           HashMap<String, Integer> storyCounter = new HashMap<String, Integer>();
-          while (fileIterator.hasNext()){
-        	  CSVRecord record = fileIterator.next();
-        	  String headline = record.get(6);
-        	  if(storyCounter.containsKey(headline)){
-        		  storyCounter.put(headline, storyCounter.get(headline).intValue()+1);
-        	  }
-        	  else{
-        		  storyCounter.put(headline, 1);
-        	  }
+          while (fileIterator.hasNext()) {
+            CSVRecord record = fileIterator.next();
+            String headline = record.get(6);
+            if (storyCounter.containsKey(headline)) {
+              storyCounter.put(headline, storyCounter.get(headline).intValue() + 1);
+            } else {
+              storyCounter.put(headline, 1);
+            }
           }
-          
-          
+
           // Re-populate tickerResearchMap and flowStoryList
           fileIterator = records.iterator();
           flowStoryList.clear();
           int lineCounter = 0;
-          
+
           while (fileIterator.hasNext()) {
             lineCounter++;
             try {
@@ -122,15 +115,18 @@ public class EquityFileParser extends TimerTask {
               String analyst = record.get(4);
               String researchLink = record.get(5);
               String headline = record.get(6);
+              headline = headline.replace("â€™", "'");
 
               SimpleDateFormat dateFormatter = new SimpleDateFormat("M/dd/yyyy hh:mm:ss a");
               Calendar publishDate = Calendar.getInstance();
               publishDate.setTime(dateFormatter.parse(record.get(7)));
 
               String story = record.get(8);
+              story = story.replace("â€™", "'");
 
               // Only keep CAD, USD stories with frequency <= 3
-              if ((currency.equals("CAD") || currency.equals("USD")) && (storyCounter.get(headline) <= 3)) {
+              if ((currency.equals("CAD") || currency.equals("USD"))
+                  && (storyCounter.get(headline) <= 3)) {
                 TickerResearch tr = new TickerResearch();
                 tr.rating = rating;
                 tr.target = target;
@@ -156,7 +152,6 @@ public class EquityFileParser extends TimerTask {
               logger.error(e);
             }
           }
-          
 
         } else {
           logger.warn("No coverage list file found on SFTP!");
@@ -198,5 +193,4 @@ public class EquityFileParser extends TimerTask {
       session.disconnect();
     }
   }
-
 }
