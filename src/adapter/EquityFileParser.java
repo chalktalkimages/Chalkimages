@@ -91,6 +91,7 @@ public class EquityFileParser extends TimerTask {
           while (fileIterator.hasNext()) {
             CSVRecord record = fileIterator.next();
             String headline = record.get(6);
+            headline = headline.replace("’", "'");
             if (storyCounter.containsKey(headline)) {
               storyCounter.put(headline, storyCounter.get(headline).intValue() + 1);
             } else {
@@ -115,14 +116,14 @@ public class EquityFileParser extends TimerTask {
               String analyst = record.get(4);
               String researchLink = record.get(5);
               String headline = record.get(6);
-              headline = headline.replace("â€™", "'");
+              headline = headline.replace("’", "'");
 
               SimpleDateFormat dateFormatter = new SimpleDateFormat("M/dd/yyyy hh:mm:ss a");
               Calendar publishDate = Calendar.getInstance();
               publishDate.setTime(dateFormatter.parse(record.get(7)));
 
               String story = record.get(8);
-              story = story.replace("â€™", "'");
+              story = story.replace("’", "'");
 
               // Only keep CAD, USD stories with frequency <= 3
               if ((currency.equals("CAD") || currency.equals("USD"))
