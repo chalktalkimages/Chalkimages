@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -77,7 +80,7 @@ public class ChalktalkReportBuilder {
             Utilities.sectionIncluded(reportSections, "Research Highlights"),
             Utilities.sectionIncluded(reportSections, "Names in the News"));
     String highlightComments = shortLongComments.get(1);
-    String symbolComments = shortLongComments.get(0);
+    String symbolComments = getSectorNameInNews(comments, reportSections);
     String htmlSignature = Utilities.buildSignature(fullName);
 
     String body = Utilities.getHTMLString("ChalkTalkTemplate.html");
@@ -463,6 +466,48 @@ public class ChalktalkReportBuilder {
     }
 
     return result;
+  }
+
+  public static String getSectorNameInNews(
+      ArrayList<CommentDetails> comments, ArrayList<String> reportSections) {
+    String result = "";
+    String temp = "";
+    String sectorSymbolComment = Utilities.getHTMLString("ChalkTalkSectorSymbolComment.html");
+    Map<String, ArrayList<CommentDetails>> sectorComments = getSectorCommentMap(comments);
+
+    Set<String> sectors = sectorComments.keySet();
+    for (String sector : sectors) {
+      temp = sectorSymbolComment;
+      ArrayList<CommentDetails> currComments = sectorComments.get(sector);
+      ArrayList<String> symbolComments =
+          buildChalktalkSymbolComments(
+              currComments,
+              Utilities.sectionIncluded(reportSections, "Research Highlights"),
+              Utilities.sectionIncluded(reportSections, "Names in the News"));
+      temp =
+          temp.replace("{{sector}}", sector).replace("{{symbolComments}}", symbolComments.get(0));
+      result = result + temp + "\n";
+    }
+    return result;
+  }
+
+  public static Map<String, ArrayList<CommentDetails>> getSectorCommentMap(
+      ArrayList<CommentDetails> comments) {
+    Map<String, ArrayList<CommentDetails>> sectorComments =
+        new LinkedHashMap<String, ArrayList<CommentDetails>>();
+    for (int i = 0; i < comments.size(); i++) {
+      CommentDetails comment = comments.get(i);
+      String sector = comment.sector();
+      ArrayList<CommentDetails> currSectorComments;
+      if (sectorComments.get(sector) == null) {
+        currSectorComments = new ArrayList<CommentDetails>();
+      } else {
+        currSectorComments = sectorComments.get(sector);
+      }
+      currSectorComments.add(comment);
+      sectorComments.put(sector, currSectorComments);
+    }
+    return sectorComments;
   }
 
   public static void main(String[] args) throws IOException, InterruptedException, SQLException {}
