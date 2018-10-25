@@ -105,13 +105,7 @@ public class ChalktalkReportBuilder {
             .replace("{{emailSignature}}", htmlSignature)
             .replace("{{macroComments}}", macroComments)
             .replace("{{indexComments}}", indexComments)
-            .replace(
-                "{{group}}",
-                (fullName.contains("Bill Liu")
-                        || fullName.contains("Chad Reed")
-                        || fullName.contains("Bilal Ijaz"))
-                    ? "PORTFOLIO"
-                    : "EQUITY");
+            .replace("{{group}}", "EQUITY");
 
     body = Utilities.replaceOddCharacters(body);
 
