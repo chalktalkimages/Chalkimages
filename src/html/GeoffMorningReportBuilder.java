@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -38,7 +39,7 @@ public class GeoffMorningReportBuilder {
     ArrayList<Comment> bellmacroindexcomments = FlowAdapter.getComments();
     String macroComments = getMacroComments(generalComments);
     String fileSave = "ChalkTalkEmail.html";
-    String htmlSignature = Utilities.getHTMLString("GeoffDarlingSignature.html");
+    String htmlSignature = Utilities.buildSignature(fullName);
     String body = Utilities.getHTMLString("GeoffMorningReportTemplate.html");
     String formattedDate = (new SimpleDateFormat("EEEE, MMMM d, yyyy")).format(new Date());
     String buyList = getIOItradelist("buy");
@@ -51,9 +52,20 @@ public class GeoffMorningReportBuilder {
         body.replace("{{formattedDateTime}}", formattedDate)
             .replace("{{MorningIndications}}", morningIndications)
             .replace("{{macroComments}}", macroComments)
-            .replace("{{SectorSymbolComments}}", getNotableNews(comments))
+            .replace(
+                "{{SectorSymbolComments}}",
+                getNotableNews(
+                    comments,
+                    Utilities.sectionIncluded(reportSections, "Research Highlights"),
+                    Utilities.sectionIncluded(reportSections, "Names in the News")))
             .replace("{{indexComments}}", indexComments)
-            .replace("{{emailSignature}}", htmlSignature);
+            .replace("{{emailSignature}}", htmlSignature)
+            .replace(
+                "{{highlightComments}}",
+                buildResearchHighlights(
+                    comments,
+                    Utilities.sectionIncluded(reportSections, "Research Highlights"),
+                    Utilities.sectionIncluded(reportSections, "Names in the News")));
 
     body = Utilities.replaceOddCharacters(body);
 
@@ -99,6 +111,15 @@ public class GeoffMorningReportBuilder {
       body = body.replace("{{NamesInTheNews}}", "");
     } else {
       body = body.replace("{{NamesInTheNews}}", Utilities.getHTMLString("GeoffNamesNews.html"));
+    }
+
+    if (!Utilities.sectionIncluded(reportSections, "Research Highlights")) {
+      body = body.replace("{{ResearchHighlights}}", "");
+    } else {
+
+      body =
+          body.replace(
+              "{{ResearchHighlights}}", Utilities.getHTMLString("GeoffResearchHighlights.html"));
     }
 
     if (!Utilities.sectionIncluded(reportSections, "Index Events")) {
@@ -186,7 +207,10 @@ public class GeoffMorningReportBuilder {
     return list;
   }
 
-  public static String getNotableNews(ArrayList<CommentDetails> comments) {
+  public static String getNotableNews(
+      ArrayList<CommentDetails> comments,
+      boolean includeHighlights,
+      boolean includeDetailedComment) {
     String result = "";
     String temp = "";
     String sectorSymbolComment = Utilities.getHTMLString("GeoffSectorSymbolComments.html");
@@ -196,7 +220,8 @@ public class GeoffMorningReportBuilder {
     for (String sector : sectors) {
       temp = sectorSymbolComment;
       ArrayList<CommentDetails> currComments = sectorComments.get(sector);
-      String symbolComments = getSymbolComments(currComments);
+      String symbolComments =
+          getSymbolComments(currComments, includeHighlights, includeDetailedComment);
       temp = temp.replace("{{sector}}", sector).replace("{{symbolComments}}", symbolComments);
       result = result + temp + "\n";
     }
@@ -210,56 +235,119 @@ public class GeoffMorningReportBuilder {
     return morningIndications;
   }
 
-  public static String getSymbolComments(ArrayList<CommentDetails> comments) {
-    String result = "";
-    String temp = "";
-    String symbolComment = Utilities.getHTMLString("GeoffSymbolComment.html");
-    ScotiaViewParser parser = new ScotiaViewParser();
+  public static String buildResearchHighlights(
+      ArrayList<CommentDetails> comments,
+      boolean includeHighlights,
+      boolean includeDetailedComment) {
+    String highlightComment = Utilities.getHTMLString("GeoffHighlightComment.html");
+    String temp2 = "";
+    String highlightAgg = "";
+    if (includeHighlights) {
 
-    try {
+      Collections.sort(comments, Utilities.getComparatorByRIC());
 
       for (CommentDetails comment : comments) {
 
         if (!comment.RIC().equals("")) { // symbol is present
-          temp = symbolComment;
+          temp2 = highlightComment;
           String ticker =
               SymbolConverter.getPrefix(SymbolConverter.RIC2Symbol(comment.belongsTo()));
-          TickerResearch research;
-          if (comment.tickerResearch != null
-              && !comment.tickerResearch.rating.isEmpty()
-              && !comment.tickerResearch.rating.equals("N/A")) research = comment.tickerResearch;
-          else {
-            Utilities.updateStatus(name, ticker);
-            research = parser.getSymbolResearch(comment.belongsTo(), ticker);
-          }
-          String sentiment = "";
-          if (comment.sentiment() != null) {
-            if (comment.sentiment().equals("Positive")) {
-              sentiment += "<font color='#27AE60'>+ve</font> ";
-            } else if (comment.sentiment().equals("Negative")) {
-              sentiment += "<font color='#ed1b2e'>-ve</font> ";
-            }
-          }
-          if (research.target.contains(".00")) {
-            research.target = research.target.replace(".00", "");
-          }
-          temp =
-              temp.replace("{{ticker}}", ticker)
-                  .replace(
+
+          if (!comment.summary().equals("")) {
+            // if detailed comment included, include hyperlink
+            if (includeDetailedComment) {
+              temp2 =
+                  temp2.replace(
+                      "{{belongsTo}}",
+                      " <a href=\"#{{belongsTo}}\" style=\"color: #000000; text-decoration: none;\" title=\"Click to read our take on {{belongsTo}}\">{{belongsTo}}</a>");
+              temp2 =
+                  temp2.replace(
                       "{{body}}",
-                      Utilities.formatSentiment(comment)
-                          + Utilities.parseQuoteComment(comment.body(), false, true))
-                  .replace(
-                      "{{rating}}",
-                      getFirstLetters(
-                          new ArrayList<String>(Arrays.asList(research.rating.split(" ")))))
-                  .replace(
-                      "{{target}}",
-                      research.target.indexOf("$") == -1 ? "$" + research.target : research.target)
-                  .replace("{{researchLink}}", research.researchLink)
-                  .replace("{{sentiment}}", sentiment);
-          ;
-          result = result + temp + "\n";
+                      " <a href=\"#{{belongsTo}}\" style=\"color: #000000; text-decoration: none;\" title=\"Click to read our take on {{belongsTo}}\">{{body}}</a>");
+              temp2 =
+                  temp2.replace(
+                      "{{sentiment}}",
+                      " <a href=\"#{{belongsTo}}\" style=\"text-decoration: none;\" title=\"Click to read our take on {{belongsTo}}\">{{sentiment}}</a>");
+            }
+            temp2 =
+                temp2
+                    .replace("{{belongsTo}}", ticker)
+                    .replace("{{sentiment}}", Utilities.formatGeoffSentimentNoDash(comment))
+                    .replace(
+                        "{{body}}", Utilities.parseQuoteComment(comment.summary(), false, true));
+            highlightAgg = highlightAgg + temp2 + "\n";
+          }
+        }
+      }
+    }
+    return highlightAgg;
+  }
+
+  public static String getSymbolComments(
+      ArrayList<CommentDetails> comments,
+      boolean includeHighlights,
+      boolean includeDetailedComment) {
+    String result = "";
+    String temp = "";
+
+    String symbolComment = Utilities.getHTMLString("GeoffSymbolComment.html");
+    ScotiaViewParser parser = new ScotiaViewParser();
+
+    try {
+      if (includeDetailedComment) {
+        for (CommentDetails comment : comments) {
+
+          if (!comment.RIC().equals("")) { // symbol is present
+            temp = symbolComment;
+            String ticker =
+                SymbolConverter.getPrefix(SymbolConverter.RIC2Symbol(comment.belongsTo()));
+            TickerResearch research;
+            if (comment.tickerResearch != null
+                && !comment.tickerResearch.rating.isEmpty()
+                && !comment.tickerResearch.rating.equals("N/A")) research = comment.tickerResearch;
+            else {
+              Utilities.updateStatus(name, ticker);
+              research = parser.getSymbolResearch(comment.belongsTo(), ticker);
+            }
+            String sentiment = "";
+            if (comment.sentiment() != null) {
+              if (comment.sentiment().equals("Positive")) {
+                sentiment += "<font color='#27AE60'>+ve</font> ";
+              } else if (comment.sentiment().equals("Negative")) {
+                sentiment += "<font color='#ed1b2e'>-ve</font> ";
+              }
+            }
+            if (research.target.contains(".00")) {
+              research.target = research.target.replace(".00", "");
+            }
+            temp =
+                temp.replace("{{ticker}}", ticker)
+                    .replace(
+                        "{{body}}",
+                        Utilities.formatSentiment(comment)
+                            + Utilities.parseQuoteComment(comment.body(), false, true))
+                    .replace(
+                        "{{rating}}",
+                        getFirstLetters(
+                            new ArrayList<String>(Arrays.asList(research.rating.split(" ")))))
+                    .replace(
+                        "{{target}}",
+                        research.target.indexOf("$") == -1
+                            ? "$" + research.target
+                            : research.target)
+                    .replace("{{researchLink}}", research.researchLink)
+                    .replace("{{sentiment}}", sentiment);
+            ;
+            if (includeHighlights) {
+              temp =
+                  temp.replace(
+                      "{{linkHighlight}}",
+                      " <a href=\"#Research Highlights\" title=\"Back to Research Highlights\">Back</a>");
+            } else {
+              temp = temp.replace("{{linkHighlight}}", "");
+            }
+            result = result + temp + "\n";
+          }
         }
       }
 

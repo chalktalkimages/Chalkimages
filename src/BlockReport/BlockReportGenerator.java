@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -377,23 +378,12 @@ public class BlockReportGenerator {
     }
   }
 
-  private static boolean checkExists(ArrayList<BlockDetails> blocks, BlockDetails blockdetail) {
-    for (BlockDetails block : blocks) {
-      if (block.equals(blockdetail)) {
-        logger.info("same tradeds found");
-        return true;
-      }
-    }
-    return false;
-  }
-
   private static ArrayList<BlockDetails> filterBlocks(ArrayList<BlockDetails> blocks) {
-    ArrayList<BlockDetails> filteredBlocks = new ArrayList<BlockDetails>();
-    for (BlockDetails block : blocks) {
-      if (!checkExists(filteredBlocks, block)) {
-        filteredBlocks.add(block);
-      }
-    }
+    logger.info("Original Blocks list: " + blocks.size());
+    HashSet<BlockDetails> blocksSet = new HashSet<BlockDetails>(blocks);
+    logger.info("Blocks set: " + blocksSet.size());
+    ArrayList<BlockDetails> filteredBlocks = new ArrayList<BlockDetails>(blocksSet);
+    logger.info("Filtered blocks list: " + filteredBlocks.size());
     return filteredBlocks;
   }
 

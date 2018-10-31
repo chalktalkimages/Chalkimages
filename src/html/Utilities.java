@@ -161,6 +161,18 @@ public class Utilities {
     } else return "";
   }
 
+  public static String formatGeoffSentimentNoDash(CommentDetails comment) {
+    if (comment.sentiment() != null
+        && !comment.sentiment().contains("null")
+        && !comment.sentiment().equals("")) {
+      if (comment.sentiment().contains("Positive"))
+        return "<font color=\"#27AE60\">" + comment.sentiment() + "</font>";
+      else if (comment.sentiment().contains("Negative"))
+        return "<font color=\"#C0392B\">" + comment.sentiment() + "</font>";
+      else return "<font color=\"#000000\">" + comment.sentiment() + "</font>";
+    } else return "";
+  }
+
   public static String parseQuoteComment(String comment, boolean isAndrewMoffatt, boolean isChalk) {
 
     boolean flag = true;

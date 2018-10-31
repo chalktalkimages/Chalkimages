@@ -1,5 +1,7 @@
 package data;
 
+import java.util.Objects;
+
 public class BlockDetails {
 
   public String brokerName;
@@ -79,5 +81,11 @@ public class BlockDetails {
       if (other.tradeTime != null) return false;
     } else if (!tradeTime.equals(other.tradeTime)) return false;
     return true;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        brokerName, notional, tradeSize, ticker, brokerID, tradePrice, tradeTime, analyst);
   }
 }
