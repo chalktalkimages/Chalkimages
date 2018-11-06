@@ -352,7 +352,11 @@ public class ChalktalkReportBuilder {
                         Utilities.formatSentiment(comment)
                             + Utilities.parseQuoteComment(comment.body(), false, true))
                     .replace("{{rating}}", research.rating)
-                    .replace("{{target}}", research.target)
+                    .replace(
+                        "{{target}}",
+                        research.target.indexOf("$") == -1
+                            ? "$" + research.target
+                            : research.target)
                     .replace("{{researchLink}}", research.researchLink);
             if (includeHighlights) {
               temp =
