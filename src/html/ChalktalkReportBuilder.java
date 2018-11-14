@@ -326,6 +326,7 @@ public class ChalktalkReportBuilder {
     String symbolComment = Utilities.getHTMLString("ChalktalkSymbolComment.html");
     String highlightComment = Utilities.getHTMLString("highlightComment.html");
     ScotiaViewParser parser = new ScotiaViewParser();
+    Collections.sort(comments, Utilities.getComparatorByRanking());
 
     try {
 
@@ -429,6 +430,7 @@ public class ChalktalkReportBuilder {
     String temp = "";
     String symbolComment = Utilities.getHTMLString("ChalktalkSymbolComment.html");
     ScotiaViewParser parser = new ScotiaViewParser();
+    Collections.sort(comments, Utilities.getComparatorByRanking());
 
     try {
 

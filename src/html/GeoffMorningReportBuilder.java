@@ -289,7 +289,7 @@ public class GeoffMorningReportBuilder {
       boolean includeDetailedComment) {
     String result = "";
     String temp = "";
-
+    Collections.sort(comments, Utilities.getComparatorByRanking());
     String symbolComment = Utilities.getHTMLString("GeoffSymbolComment.html");
     ScotiaViewParser parser = new ScotiaViewParser();
 

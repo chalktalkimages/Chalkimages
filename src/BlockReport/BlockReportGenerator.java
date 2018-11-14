@@ -369,6 +369,7 @@ public class BlockReportGenerator {
 
     reportHtml =
         reportHtml
+            .replace("{{Fiscal}}", "")
             .replace("{{formattedDate}}", formattedDate)
             .replace("{{emailSignature}}", Utilities.buildSignature(fullname));
 
@@ -666,6 +667,7 @@ public class BlockReportGenerator {
 
     reportHtml =
         reportHtml
+            .replace("{{Fiscal}}", "")
             .replace("{{formattedDate}}", formattedDate)
             .replace("{{emailSignature}}", Utilities.buildSignature(fullname));
     try (PrintWriter out = new PrintWriter(fileSave)) {
@@ -677,7 +679,8 @@ public class BlockReportGenerator {
   public static void saveBlockEmailHtml(
       String fullname,
       Collection<BlockBroker> blockbroker,
-      Collection<BlockSecurity> blocksecurity) {
+      Collection<BlockSecurity> blocksecurity,
+      boolean isFiscal) {
 
     ArrayList<BlockBroker> blockbrokerList = new ArrayList<BlockBroker>(blockbroker);
     ArrayList<BlockSecurity> blocksecurityList = new ArrayList<BlockSecurity>(blocksecurity);
@@ -799,6 +802,11 @@ public class BlockReportGenerator {
               .replace("{{volume}}", NumberFormat.getNumberInstance(Locale.US).format(b.volume))
               .replace("{{value}}", "$" + String.format("%1$,.0f", b.notional));
       count++;
+    }
+    if (isFiscal) {
+      reportHtml = reportHtml.replace("{{Fiscal}}", "- FISCAL");
+    } else {
+      reportHtml = reportHtml.replace("{{Fiscal}}", "");
     }
     reportHtml =
         reportHtml

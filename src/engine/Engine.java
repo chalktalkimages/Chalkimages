@@ -151,7 +151,7 @@ public class Engine {
   }
 
   public void generatemorningBlockReport(
-      String fullname, ArrayList<BlockDetails> blocks, java.lang.Boolean isFlow) {
+      String fullname, ArrayList<BlockDetails> blocks, java.lang.Boolean isFlow, boolean isFiscal) {
     logger.info("Block Report build request received from: " + fullname + "\n");
     if (blocks == null || blocks.isEmpty()) {
       logger.info("Empty block list, report and email not generated.");
@@ -161,7 +161,7 @@ public class Engine {
     Collection<BlockBroker> blockbroker = BlockReportGenerator.getBlocksByBroker(blocks);
     Collection<BlockSecurity> blocksecurity =
         BlockReportGenerator.getBlocksBySecurity(blocks, isFlow);
-    BlockReportGenerator.saveBlockEmailHtml(fullname, blockbroker, blocksecurity);
+    BlockReportGenerator.saveBlockEmailHtml(fullname, blockbroker, blocksecurity, isFiscal);
     HashMap<String, ArrayList<BlockDetails>> blockbyTimeBroker =
         BlockReportGenerator.sortbyBrokerTimeTicker(blocks);
     BlockReportGenerator.createBlockReportExcel(blockbroker, blocksecurity, blockbyTimeBroker);
@@ -233,7 +233,7 @@ public class Engine {
     Collection<BlockBroker> blockbroker = BlockReportGenerator.getBlocksByBroker(blocks);
     Collection<BlockSecurity> blocksecurity =
         BlockReportGenerator.getBlocksBySecurity(blocks, isFlow);
-    BlockReportGenerator.saveBlockEmailHtml(fullname, blockbroker, blocksecurity);
+    BlockReportGenerator.saveBlockEmailHtml(fullname, blockbroker, blocksecurity, false);
     HashMap<String, ArrayList<BlockDetails>> blockbyTimeBroker =
         BlockReportGenerator.sortbyBrokerTimeTicker(blocks);
     BlockReportGenerator.createBlockReportExcel(blockbroker, blocksecurity, blockbyTimeBroker);

@@ -75,7 +75,16 @@ public class ChalktalkController {
       headers = "Accept=application/json")
   public @ResponseBody void generatemorningBlockReport(@RequestBody BlockWrapper wrapper) {
     Engine.getInstance()
-        .generatemorningBlockReport(wrapper.fullname, wrapper.blocks, wrapper.isFlow);
+        .generatemorningBlockReport(wrapper.fullname, wrapper.blocks, wrapper.isFlow, false);
+  }
+
+  @RequestMapping(
+      value = "/send-morning-BlockReport-Fiscal",
+      method = RequestMethod.POST,
+      headers = "Accept=application/json")
+  public @ResponseBody void generatemorningBlockReportFiscal(@RequestBody BlockWrapper wrapper) {
+    Engine.getInstance()
+        .generatemorningBlockReport(wrapper.fullname, wrapper.blocks, wrapper.isFlow, true);
   }
 
   @RequestMapping(

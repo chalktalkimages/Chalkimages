@@ -53,13 +53,19 @@ function performRequest(endpoint, method, data, success) {
 
 // query Object for order tracker block search
 var queryObject = {brokers: [], ticker: ''};
+var fiscalQueryObject = {brokers: [], ticker: ''};
 
 var yesterday = new Date();
 yesterday.setHours(0,0,0,0);
+
 if (yesterday.getDay() == 1) // Monday
     yesterday.setDate(yesterday.getDate() - 3);
 else
     yesterday.setDate(yesterday.getDate() - 1);
+    
+var fiscalDate = new Date();
+fiscalDate.setHours(0,0,0,0);
+fiscalDate.setFullYear(yesterday.getFullYear(), 10, 1)    
 
 queryObject.startdate = yesterday;
 queryObject.enddate = yesterday;
@@ -67,6 +73,16 @@ queryObject.filters = [0, 1, 8, 9, 11, 12, 13, 14, 17, 18, 21 ];
 
 queryObject.aggregate = false;
 queryObject.user = 'bliu';
+
+if(yesterday < fiscalDate)
+	fiscalDate.setFullYear(yesterday.getFullYear() - 1, 10, 1)
+	
+fiscalQueryObject.startdate = fiscalDate;
+fiscalQueryObject.enddate = yesterday;
+fiscalQueryObject.filters = [0, 1, 8, 9, 11, 12, 13, 14, 17, 18, 21 ];
+
+fiscalQueryObject.aggregate = false;
+fiscalQueryObject.user = 'bliu';
 
 
 function aggregateBlockList() {
@@ -107,6 +123,26 @@ function IanBlockList() {
       port = '9002';
       // send chalk server request
       performRequest('/send-morning-BlockReport', 'POST', {fullname: 'IanBlockReportEmail', blocks: blockList, isFlow: false}, function(responseData) {
+      }); 
+  });
+}
+
+function IanFiscalBlockList() {
+    // Ian block list
+  // get data from OT
+  queryObject.liabilityTraders = ['Ian.Reston@SCIT.CA'];
+  port = '8001';
+  performRequest('/search-block-orders', 'POST', fiscalQueryObject, function (responseData) {
+      var list = responseData.blocks;
+      var blockList = [];
+      for (var i = 0; i < list.length; i++) {
+          blockList.push({brokerName: list[i].broker, notional: list[i].value, tradeSize: list[i].volume, ticker: list[i].security, brokerID: String(list[i].brokerid), tradePrice: parseFloat(Math.round(list[i].avgpx * 100) / 100).toFixed(2), tradeTime: list[i].startdate});
+          
+     }
+      console.log('Sending create Ian\'s fiscal block report and email request to chalk...\n')
+      port = '9002';
+      // send chalk server request
+      performRequest('/send-morning-BlockReport-Fiscal', 'POST', {fullname: 'IanBlockReportEmail', blocks: blockList, isFlow: false}, function(responseData) {
       });
   });
 }
@@ -172,9 +208,8 @@ function ColinBlockList() {
   });  
 }
 
-
-
 IanBlockList();
+setTimeout(function(){IanFiscalBlockList()}, 10000);
 
 
 
