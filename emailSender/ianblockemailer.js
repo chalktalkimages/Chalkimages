@@ -130,7 +130,7 @@ function IanBlockList() {
 function IanFiscalBlockList() {
     // Ian block list
   // get data from OT
-  queryObject.liabilityTraders = ['Ian.Reston@SCIT.CA'];
+  fiscalQueryObject.liabilityTraders = ['Ian.Reston@SCIT.CA'];
   port = '8001';
   performRequest('/search-block-orders', 'POST', fiscalQueryObject, function (responseData) {
       var list = responseData.blocks;
