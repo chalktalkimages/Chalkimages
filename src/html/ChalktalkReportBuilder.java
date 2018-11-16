@@ -59,6 +59,8 @@ public class ChalktalkReportBuilder {
     ArrayList<Comment> bellmacroindexcomments = FlowAdapter.getComments();
 
     String fileSave = "ChalkTalkEmail.html";
+    //    String fileSave = System.getProperty("user.dir") + "\\templates\\" +
+    // "ChalkTalkEmail.html";
     String formattedDate = (new SimpleDateFormat("EEEE, MMMM d, yyyy")).format(new Date());
     String imagePath =
         "https://raw.githubusercontent.com/chalktalkimages/Chalkimages/master/archive/";
@@ -493,6 +495,7 @@ public class ChalktalkReportBuilder {
 
   public static Map<String, ArrayList<CommentDetails>> getSectorCommentMap(
       ArrayList<CommentDetails> comments) {
+    Collections.sort(comments, Utilities.getComparatorByRanking());
     Map<String, ArrayList<CommentDetails>> sectorComments =
         new LinkedHashMap<String, ArrayList<CommentDetails>>();
     for (int i = 0; i < comments.size(); i++) {

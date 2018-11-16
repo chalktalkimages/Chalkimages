@@ -39,6 +39,9 @@ public class GeoffMorningReportBuilder {
     ArrayList<Comment> bellmacroindexcomments = FlowAdapter.getComments();
     String macroComments = getMacroComments(generalComments);
     String fileSave = "ChalkTalkEmail.html";
+    //    String fileSave = System.getProperty("user.dir") + "\\templates\\" +
+    // "ChalkTalkEmail.html";
+
     String htmlSignature = Utilities.buildSignature(fullName);
     String body = Utilities.getHTMLString("GeoffMorningReportTemplate.html");
     String formattedDate = (new SimpleDateFormat("EEEE, MMMM d, yyyy")).format(new Date());
@@ -337,15 +340,6 @@ public class GeoffMorningReportBuilder {
                             : research.target)
                     .replace("{{researchLink}}", research.researchLink)
                     .replace("{{sentiment}}", sentiment);
-            ;
-            if (includeHighlights) {
-              temp =
-                  temp.replace(
-                      "{{linkHighlight}}",
-                      " <a href=\"#Research Highlights\" title=\"Back to Research Highlights\">Back</a>");
-            } else {
-              temp = temp.replace("{{linkHighlight}}", "");
-            }
             result = result + temp + "\n";
           }
         }
@@ -363,6 +357,7 @@ public class GeoffMorningReportBuilder {
       ArrayList<CommentDetails> comments) {
     Map<String, ArrayList<CommentDetails>> sectorComments =
         new LinkedHashMap<String, ArrayList<CommentDetails>>();
+    Collections.sort(comments, Utilities.getComparatorByRanking());
     for (int i = 0; i < comments.size(); i++) {
       CommentDetails comment = comments.get(i);
       String sector = comment.sector();
