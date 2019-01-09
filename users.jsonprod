@@ -5,10 +5,14 @@
 	{"fullName": "Bill Liu", "htmlSignature": "BillLiuSignature.html", "emailRecipients": "billjd.liu@scotiabank.com"},
 	{"fullName": "Tim Stewart", "htmlSignature": "TimStewartSignature.html", "emailRecipients": "tim.stewart@scotiabank.com;billjd.liu@scotiabank.com;EESCoop@scotiabank.com;puneet.kaur@scotiabank.com"},
 	{"fullName": "Geoff Darling", "htmlSignature": "GeoffDarlingSignature.html", "emailRecipients": "geoff.darling@scotiabank.com;billjd.liu@scotiabank.com;EESCoop@scotiabank.com;puneet.kaur@scotiabank.com"},
+	{"fullName": "Geoff Darling - BCP", "htmlSignature": "GeoffDarlingSignature.html", "emailRecipients": "geoff.darling@scotiabank.com;billjd.liu@scotiabank.com;EESCoop@scotiabank.com;puneet.kaur@scotiabank.com"},
 	{"fullName": "Swanzy Quarshie", "htmlSignature": "SwanzyQuarshieSignature.html", "emailRecipients": "swanzy.quarshie@scotiabank.com;billjd.liu@scotiabank.com;EESCoop@scotiabank.com;puneet.kaur@scotiabank.com"},
 	{"fullName": "Bilal Ijaz", "htmlSignature": "BilalIjazSignature.html", "emailRecipients": "chad.reed@scotiabank.com;bilal.ijaz@scotiabank.com;billjd.liu@scotiabank.com;EESCoop@scotiabank.com;puneet.kaur@scotiabank.com"},
+	{"fullName": "Bilal Ijaz - BCP", "htmlSignature": "BilalIjazSignature.html", "emailRecipients": "chad.reed@scotiabank.com;bilal.ijaz@scotiabank.com;billjd.liu@scotiabank.com;EESCoop@scotiabank.com;puneet.kaur@scotiabank.com"},
 	{"fullName": "George Gardiner", "htmlSignature": "ChadReedSignature.html", "emailRecipients": "george.gardiner@scotiabank.com;billjd.liu@scotiabank.com;EESCoop@scotiabank.com;puneet.kaur@scotiabank.com"},
+	{"fullName": "George Gardiner - BCP", "htmlSignature": "ChadReedSignature.html", "emailRecipients": "george.gardiner@scotiabank.com;billjd.liu@scotiabank.com;EESCoop@scotiabank.com;puneet.kaur@scotiabank.com"},
 	{"fullName": "Scott Macdonald", "htmlSignature": "ChadReedSignature.html", "emailRecipients": "scott.macdonald@scotiabank.com;billjd.liu@scotiabank.com;EESCoop@scotiabank.com;puneet.kaur@scotiabank.com"},
+	{"fullName": "Scott Macdonald - BCP", "htmlSignature": "ChadReedSignature.html", "emailRecipients": "scott.macdonald@scotiabank.com;billjd.liu@scotiabank.com;EESCoop@scotiabank.com;puneet.kaur@scotiabank.com"},
 	{"fullName": "Andrew Moffatt", "htmlSignature": "ChadReedSignature.html", "emailRecipients": "andrew.moffatt@scotiabank.com;billjd.liu@scotiabank.com;EESCoop@scotiabank.com;puneet.kaur@scotiabank.com"},
 	{"fullName": "Colin Thacker", "htmlSignature": "ColinThackerSignature.html", "emailRecipients": "colin.thacker@scotiabank.com;billjd.liu@scotiabank.com;EESCoop@scotiabank.com"},
 	{"fullName": "Peter Newell", "htmlSignature": "PeterNewellSignature.html", "emailRecipients": "peter.newell@scotiabank.com;billjd.liu@scotiabank.com;EESCoop@scotiabank.com"},
@@ -27,5 +31,7 @@
 	{"fullName": "R300 Trader Report", "htmlSignature": "morningSignature.html", "emailRecipients": "pruyn.haskins@scotiabank.com;john.mccartney@scotiabank.com;paul.ohea@scotiabank.com;scott.wigle@scotiabank.com;billjd.liu@scotiabank.com;puneet.kaur@scotiabank.com"},
 	{"fullName": "TonyTestEmail", "htmlSignature": "morningSignature.html", "emailRecipients": "tracy.jin@scotiabank.com"},
 	{"fullName": "Puneet Kaur", "htmlSignature": "TracyJinSignature.html", "emailRecipients": "puneet.kaur@scotiabank.com"},
-	{"fullName": "Jordan Johnston", "htmlSignature": "JordanJohnstonSignature.html", "emailRecipients": "jordan.johnston@scotiabank.com"}
+	{"fullName": "Jordan Johnston", "htmlSignature": "JordanJohnstonSignature.html", "emailRecipients": "jordan.johnston@scotiabank.com"},
+	{"fullName": "Michael Letros", "htmlSignature": "MichaelLetrosSignature.html", "emailRecipients": "michael.letros@scotiabank.com"},
+	{"fullName": "Lauren Wisniewski", "htmlSignature": "LaurenWisniewskiSignature.html", "emailRecipients": "lauren.wisniewski@scotiabank.com"}
 ]
