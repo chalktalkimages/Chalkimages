@@ -16,6 +16,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.log4j.Logger;
 
 import BlockReport.BlockReportGenerator;
+import adapter.DBHandle;
+import adapter.EquityFileParser;
 import adapter.MailRequest;
 import data.BlockAnalyst;
 import data.BlockBroker;
@@ -43,6 +45,9 @@ public class Engine {
   private static Engine singleton_ = null;
 
   public ConcurrentHashMap<String, String> serverStatus = new ConcurrentHashMap<String, String>();
+
+  // ticker, historical price in string
+  public HashMap<String, String> priceTargetChangesMap = new HashMap<String, String>();
 
   private static final Logger logger = Logger.getLogger(Engine.class.getName());
 
@@ -300,7 +305,10 @@ public class Engine {
       MiningScoopReportBuilder.buildReport(user.getFullname(), comments);
     } else if (reportType == 9) {
       GeoffMorningReportBuilder.buildReport(
-          user.getFullname(), comments, generalComments, reportSections);
+          user.getFullname(), comments, generalComments, reportSections, false);
+    } else if (reportType == 10) {
+      GeoffMorningReportBuilder.buildReport(
+          user.getFullname(), comments, generalComments, reportSections, true);
     }
   }
 
@@ -334,6 +342,32 @@ public class Engine {
     logger.info("Requesting today's Scotia View analyst stories...");
     ScotiaViewParser parser = new ScotiaViewParser();
     return parser.getScotiaviewStories();
+  }
+
+  public void populatePriceTargetChanges() {
+    Map<String, String> previousTargetMap = DBHandle.historicalTargetPriceMap;
+    for (Map.Entry<String, String> target : EquityFileParser.currentTargetMap.entrySet()) {
+      String ticker = target.getKey();
+      String price = target.getValue();
+      if (previousTargetMap.containsKey(ticker)) {
+        if (!previousTargetMap.get(ticker).equals(price)) {
+          DBHandle.modifyPriceTarget(ticker, price);
+          logger.info(
+              "Target Price Change, modifying database for ticker: "
+                  + ticker
+                  + " from price "
+                  + previousTargetMap.get(ticker)
+                  + " to "
+                  + price);
+          priceTargetChangesMap.put(ticker, previousTargetMap.get(ticker));
+        }
+      } else {
+        priceTargetChangesMap.put(ticker, price);
+        logger.info("Adding ticker to database: " + ticker + " , " + price);
+        DBHandle.addPriceTarget(ticker, price);
+      }
+    }
+    EquityFileParser.load();
   }
 
   public static void main(String[] args) {

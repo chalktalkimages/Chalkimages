@@ -29,6 +29,7 @@ import com.jcraft.jsch.SftpException;
 
 import data.FlowStories;
 import data.TickerResearch;
+import engine.Engine;
 import utils.Globals;
 
 public class EquityFileParser extends TimerTask {
@@ -38,6 +39,7 @@ public class EquityFileParser extends TimerTask {
   private static ChannelSftp channel;
   public static HashMap<String, TickerResearch> tickerResearchMap =
       new HashMap<String, TickerResearch>();
+  public static HashMap<String, String> currentTargetMap = new HashMap<String, String>();
   public static List<FlowStories> flowStoryList = new ArrayList<FlowStories>();
 
   static {
@@ -65,7 +67,8 @@ public class EquityFileParser extends TimerTask {
     if (channel != null) {
       try {
         Map<Integer, String> fileMap = new TreeMap<Integer, String>();
-
+        HashMap<String, String> tempPriceTargetChangeMap =
+            Engine.getInstance().priceTargetChangesMap;
         // Add all filenames on the FTP to the TreeMap
         // The TreeMap sorts values in ascending order
         int i = 0;
@@ -133,6 +136,8 @@ public class EquityFileParser extends TimerTask {
                 tr.target = target;
                 tr.researchLink = researchLink;
                 tickerResearchMap.put(ticker, tr);
+                if (tempPriceTargetChangeMap.containsKey(ticker))
+                  tr.previousTarget = tempPriceTargetChangeMap.get(ticker);
 
                 FlowStories fs = new FlowStories();
                 fs.author = analyst;
@@ -148,12 +153,14 @@ public class EquityFileParser extends TimerTask {
                 today.set(Calendar.MILLISECOND, 0);
                 if (publishDate.after(today)) flowStoryList.add(fs);
               }
+
+              currentTargetMap.put(ticker, target);
+
             } catch (Exception e) {
               logger.warn("Failed on line " + lineCounter);
               logger.error(e);
             }
           }
-
         } else {
           logger.warn("No coverage list file found on SFTP!");
         }

@@ -29,12 +29,15 @@ import utils.SymbolConverter;
 public class GeoffMorningReportBuilder {
   private static final Logger logger = Logger.getLogger(ChalktalkReportBuilder.class.getName());
   private static String name = "";
+  private static boolean titlesOnlyReport = false;
 
   public static void buildReport(
       String fullName,
       ArrayList<CommentDetails> comments,
       ArrayList<GeneralComment> generalComments,
-      ArrayList<String> reportSections) {
+      ArrayList<String> reportSections,
+      boolean titlesOnly) {
+    titlesOnlyReport = titlesOnly;
     name = fullName;
     ArrayList<Comment> bellmacroindexcomments = FlowAdapter.getComments();
     String macroComments = getMacroComments(generalComments);
@@ -113,7 +116,11 @@ public class GeoffMorningReportBuilder {
     if (!Utilities.sectionIncluded(reportSections, "Names in the News")) {
       body = body.replace("{{NamesInTheNews}}", "");
     } else {
-      body = body.replace("{{NamesInTheNews}}", Utilities.getHTMLString("GeoffNamesNews.html"));
+      if (titlesOnlyReport)
+        body =
+            body.replace("{{NamesInTheNews}}", Utilities.getHTMLString("TitlesOnlyNamesNews.html"));
+      else
+        body = body.replace("{{NamesInTheNews}}", Utilities.getHTMLString("GeoffNamesNews.html"));
     }
 
     if (!Utilities.sectionIncluded(reportSections, "Research Highlights")) {
@@ -217,6 +224,8 @@ public class GeoffMorningReportBuilder {
     String result = "";
     String temp = "";
     String sectorSymbolComment = Utilities.getHTMLString("GeoffSectorSymbolComments.html");
+    if (titlesOnlyReport)
+      sectorSymbolComment = Utilities.getHTMLString("TitlesOnlySectorSymbolComments.html");
     Map<String, ArrayList<CommentDetails>> sectorComments = getSectorCommentMap(comments);
 
     Set<String> sectors = sectorComments.keySet();
@@ -294,6 +303,7 @@ public class GeoffMorningReportBuilder {
     String temp = "";
     Collections.sort(comments, Utilities.getComparatorByRanking());
     String symbolComment = Utilities.getHTMLString("GeoffSymbolComment.html");
+    if (titlesOnlyReport) symbolComment = Utilities.getHTMLString("TitlesOnlySymbolComment.html");
     ScotiaViewParser parser = new ScotiaViewParser();
 
     try {
@@ -323,23 +333,66 @@ public class GeoffMorningReportBuilder {
             if (research.target.contains(".00")) {
               research.target = research.target.replace(".00", "");
             }
+            if (research.previousTarget.contains(".00")) {
+              research.previousTarget = research.previousTarget.replace(".00", "");
+            }
+            if (titlesOnlyReport) {
+              temp =
+                  temp.replace(
+                      "{{body}}",
+                      Utilities.formatGeoffSentiment(comment)
+                          + Utilities.parseQuoteComment(comment.summary(), false, true));
+              if (comments.size() == 2) {
+                if (comments.indexOf(comment) == 0) {
+                  temp =
+                      temp.replace("{{paddingClass}}", "cell-padding-bottom")
+                          .replace("{{linkPaddingClass}}", "cell-padding-bottom");
+                } else {
+                  temp = temp.replace("{{paddingClass}}", "").replace("{{linkPaddingClass}}", "");
+                }
+              } else {
+                if (comments.indexOf(comment) == 0
+                    || comments.indexOf(comment) == (comments.size() - 1)) {
+                  temp = temp.replace("{{paddingClass}}", "").replace("{{linkPaddingClass}}", "");
+                } else {
+                  temp =
+                      temp.replace("{{paddingClass}}", "cell-padding")
+                          .replace("{{linkPaddingClass}}", "cell-padding");
+                }
+              }
+            } else {
+              temp =
+                  temp.replace(
+                      "{{body}}",
+                      Utilities.formatGeoffSentiment(comment)
+                          + Utilities.parseQuoteComment(comment.body(), false, true));
+              temp = temp.replace("{{paddingClass}}", "").replace("{{linkPaddingClass}}", "");
+            }
+            if (!research.previousTarget.equals(research.target)
+                && !research.previousTarget.equals("N/A")
+                && titlesOnlyReport)
+              temp =
+                  temp.replace(
+                      "{{target}}",
+                      (research.target.indexOf("$") == -1 ? "$" + research.target : research.target)
+                          + " from "
+                          + (research.previousTarget.indexOf("$") == -1
+                              ? "$" + research.previousTarget
+                              : research.previousTarget));
+            else
+              temp =
+                  temp.replace(
+                      "{{target}}",
+                      research.target.indexOf("$") == -1 ? "$" + research.target : research.target);
             temp =
                 temp.replace("{{ticker}}", ticker)
-                    .replace(
-                        "{{body}}",
-                        Utilities.formatSentiment(comment)
-                            + Utilities.parseQuoteComment(comment.body(), false, true))
                     .replace(
                         "{{rating}}",
                         getFirstLetters(
                             new ArrayList<String>(Arrays.asList(research.rating.split(" ")))))
-                    .replace(
-                        "{{target}}",
-                        research.target.indexOf("$") == -1
-                            ? "$" + research.target
-                            : research.target)
                     .replace("{{researchLink}}", research.researchLink)
                     .replace("{{sentiment}}", sentiment);
+
             result = result + temp + "\n";
           }
         }

@@ -149,6 +149,16 @@ public class Utilities {
     } else return "";
   }
 
+  public static String formatGeoffSentiment(CommentDetails comment) {
+    if (comment.sentiment() != null
+        && !comment.sentiment().contains("null")
+        && !comment.sentiment().equals("")) {
+      if (comment.sentiment().contains("Positive") || comment.sentiment().contains("Negative"))
+        return "";
+      else return comment.sentiment() + " - ";
+    } else return "";
+  }
+
   public static String formatSentimentNoDash(CommentDetails comment) {
     if (comment.sentiment() != null
         && !comment.sentiment().contains("null")

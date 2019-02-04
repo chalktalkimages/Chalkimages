@@ -23,6 +23,7 @@ import adapter.EquityFileParser;
 import data.FlowStories;
 import data.SecInfo;
 import data.TickerResearch;
+import engine.Engine;
 import utils.SymbolConverter;
 
 public class ScotiaViewParser {
@@ -171,7 +172,7 @@ public class ScotiaViewParser {
     }
   }
 
-  private TickerResearch getPageDetails(String secID) {
+  private TickerResearch getPageDetails(String secID, String ticker) {
     String rating = "N/A";
     String target = "N/A";
     String researchLink = "";
@@ -204,7 +205,7 @@ public class ScotiaViewParser {
     } catch (Exception e) {
       if (attemptCounter < attemptLimit) {
         attemptCounter++;
-        return getPageDetails(secID); // try again if this is the first
+        return getPageDetails(secID, ticker); // try again if this is the first
         // attempt
       }
       logger.info("Failed to get symbol data for ticker after 5 attempts " + e.getMessage());
@@ -212,7 +213,13 @@ public class ScotiaViewParser {
     }
 
     if (rating.equals("N/A") && target.equals("N/A") && researchLink.equals("")) return null;
-    else return new TickerResearch(rating, target, researchLink);
+    else {
+      HashMap<String, String> tempPriceTargetChangeMap = Engine.getInstance().priceTargetChangesMap;
+      if (tempPriceTargetChangeMap.containsKey(ticker))
+        return new TickerResearch(
+            rating, target, researchLink, tempPriceTargetChangeMap.get(ticker));
+      else return new TickerResearch(rating, target, researchLink, "N/A");
+    }
   }
 
   public TickerResearch getSymbolResearch(String ric, String ticker) {
@@ -253,7 +260,7 @@ public class ScotiaViewParser {
     String exchange = getExchange(ric);
     ArrayList<SecInfo> secIDs = tickerIDMap.get(ticker);
     if (secIDs == null) {
-      return new TickerResearch("N/A", "N/A", "");
+      return new TickerResearch("N/A", "N/A", "", "N/A");
     } else {
       boolean found = false;
       String ID = null;
@@ -272,14 +279,14 @@ public class ScotiaViewParser {
         }
       }
       if (found) {
-        TickerResearch result = getPageDetails(ID);
+        TickerResearch result = getPageDetails(ID, ticker);
         if (result == null) {
           TickerResearch altResult = null;
           boolean success = false;
 
           for (SecInfo s : secIDs) {
             if (!ID.equals(s.ID)) {
-              altResult = getPageDetails(s.ID);
+              altResult = getPageDetails(s.ID, ticker);
             }
             if (altResult != null) {
               success = true;
@@ -289,19 +296,19 @@ public class ScotiaViewParser {
           if (success) {
             return altResult;
           } else {
-            return new TickerResearch("N/A", "N/A", "");
+            return new TickerResearch("N/A", "N/A", "", "N/A");
           }
         } else {
           return result;
         }
-      } else return new TickerResearch("N/A", "N/A", "");
+      } else return new TickerResearch("N/A", "N/A", "", "N/A");
     }
   }
 
   public List<FlowStories> getScotiaviewStories() {
 
     if (EquityFileParser.flowStoryList.size() > 0) {
-      logger.info("Using cached list");	
+      logger.info("Using cached list");
       return EquityFileParser.flowStoryList;
     } else {
       List<FlowStories> results = getStories(lastestResearchURL1);
