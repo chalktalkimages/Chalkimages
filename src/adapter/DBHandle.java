@@ -31,7 +31,7 @@ public class DBHandle implements Serializable {
       "SELECT [ID_EXCH_SYMBOL], [RIC], [LONG_COMP_NAME] FROM [SecurityMaster].[dbo].[IEST_MSD_BASE] WHERE (RIC LIKE '%.TO' OR RIC LIKE '%.V') ORDER BY RIC";
 
   private static final String SQL_HISTORICAL_PRICE_TARGET =
-      "SELECT * FROM [Portfolio].[dbo].[HISTORICAL_PRICE_TARGET]";
+      "SELECT [ticker], [price] FROM [Portfolio].[dbo].[HISTORICAL_PRICE_TARGET]";
 
   private static final String SQL_ADD_HISTORICAL_PRICE_TARGET =
       "INSERT INTO [Portfolio].[dbo].[HISTORICAL_PRICE_TARGET] ([ticker],[price]) VALUES ('%s','%s')";
@@ -68,17 +68,15 @@ public class DBHandle implements Serializable {
       }
       nameMap = tempName;
 
-      logger.info("Loading SPTSX60 Index...");
+      logger.info("Loading Target Prices...");
       rsResultSet = stmt.executeQuery(SQL_HISTORICAL_PRICE_TARGET);
-      Map<String, String> tempHistoricalTargetPriceMap = new HashMap<String, String>();
       while (rsResultSet.next()) {
         String ticker = rsResultSet.getString(1);
         String price = rsResultSet.getString(2);
-        tempHistoricalTargetPriceMap.put(ticker, price);
+        historicalTargetPriceMap.put(ticker, price);
       }
-      historicalTargetPriceMap = tempHistoricalTargetPriceMap;
     } catch (SQLException sqle) {
-      logger.warn("Failed loading cached TSX params from SQL!", sqle);
+      logger.warn("Failed loading historical target prices from SQL!", sqle);
     }
   }
 
