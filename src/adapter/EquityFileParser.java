@@ -129,8 +129,7 @@ public class EquityFileParser extends TimerTask {
               story = story.replace("’", "'");
 
               // Only keep CAD, USD stories with frequency <= 3
-              if ((currency.equals("CAD") || currency.equals("USD"))
-                  && (storyCounter.get(headline) <= 3)) {
+              if ((currency.equals("CAD") || currency.equals("USD"))) {
                 TickerResearch tr = new TickerResearch();
                 tr.rating = rating;
                 tr.target = target;
@@ -139,19 +138,20 @@ public class EquityFileParser extends TimerTask {
                 if (tempPriceTargetChangeMap.containsKey(ticker))
                   tr.previousTarget = tempPriceTargetChangeMap.get(ticker);
 
-                FlowStories fs = new FlowStories();
-                fs.author = analyst;
-                fs.headline = headline;
-                fs.link = researchLink;
-                fs.story = story;
-                fs.ticker = ticker;
-
-                Calendar today = Calendar.getInstance();
-                today.set(Calendar.HOUR_OF_DAY, 0);
-                today.set(Calendar.MINUTE, 0);
-                today.set(Calendar.SECOND, 0);
-                today.set(Calendar.MILLISECOND, 0);
-                if (publishDate.after(today)) flowStoryList.add(fs);
+                if (storyCounter.get(headline) <= 3) {
+                  Calendar today = Calendar.getInstance();
+                  today.set(Calendar.HOUR_OF_DAY, 0);
+                  today.set(Calendar.MINUTE, 0);
+                  today.set(Calendar.SECOND, 0);
+                  today.set(Calendar.MILLISECOND, 0);
+                  FlowStories fs = new FlowStories();
+                  fs.author = analyst;
+                  fs.link = researchLink;
+                  fs.ticker = ticker;
+                  fs.story = story;
+                  fs.headline = headline;
+                  if (publishDate.after(today)) flowStoryList.add(fs);
+                }
               }
 
               currentTargetMap.put(ticker, target);
