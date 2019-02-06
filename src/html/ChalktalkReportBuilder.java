@@ -402,12 +402,16 @@ public class ChalktalkReportBuilder {
                         "{{sentiment}}",
                         " <a href=\"#Our Take on {{belongsTo}}\" style=\"text-decoration: none;\" title=\"Click to read our take on {{belongsTo}}\">{{sentiment}}</a>");
               }
+              String summary = Utilities.parseQuoteComment(comment.summary(), false, true);
+              if (summary.length() > 100) {
+                summary = summary.substring(0, 99);
+                summary += "...";
+              }
               temp2 =
                   temp2
                       .replace("{{belongsTo}}", ticker)
                       .replace("{{sentiment}}", Utilities.formatSentimentNoDash(comment))
-                      .replace(
-                          "{{body}}", Utilities.parseQuoteComment(comment.summary(), false, true));
+                      .replace("{{body}}", summary);
               highlightAgg = highlightAgg + temp2 + "\n";
             }
           }

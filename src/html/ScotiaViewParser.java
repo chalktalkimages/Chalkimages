@@ -179,6 +179,7 @@ public class ScotiaViewParser {
 
     int attemptCounter = 0;
     try {
+      logger.info("Getting target prices from scotiaview for ticker " + ticker);
       Document doc =
           Jsoup.connect("https://www.scotiaview.com/company/" + secID)
               .userAgent(
