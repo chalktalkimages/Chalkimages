@@ -43,8 +43,8 @@ public class Application {
 
     // Run check for target changes at 7:32am everyday.
     Calendar priceTargetDate = Calendar.getInstance();
-    priceTargetDate.set(Calendar.HOUR_OF_DAY, 7);
-    priceTargetDate.set(Calendar.MINUTE, 32);
+    priceTargetDate.set(Calendar.HOUR_OF_DAY, 6);
+    priceTargetDate.set(Calendar.MINUTE, 15);
     priceTargetDate.set(Calendar.SECOND, 0);
 
     if (Calendar.getInstance().before(priceTargetDate)) {
