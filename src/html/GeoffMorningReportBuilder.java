@@ -351,13 +351,12 @@ public class GeoffMorningReportBuilder {
                   temp = temp.replace("{{paddingClass}}", "").replace("{{linkPaddingClass}}", "");
                 }
               } else {
-                if (comments.indexOf(comment) == 0
-                    || comments.indexOf(comment) == (comments.size() - 1)) {
+                if (comments.indexOf(comment) == (comments.size() - 1)) {
                   temp = temp.replace("{{paddingClass}}", "").replace("{{linkPaddingClass}}", "");
                 } else {
                   temp =
-                      temp.replace("{{paddingClass}}", "cell-padding")
-                          .replace("{{linkPaddingClass}}", "cell-padding");
+                      temp.replace("{{paddingClass}}", "cell-padding-bottom")
+                          .replace("{{linkPaddingClass}}", "cell-padding-bottom");
                 }
               }
             } else {
