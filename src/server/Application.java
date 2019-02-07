@@ -41,7 +41,7 @@ public class Application {
     wipeTimer.scheduleAtFixedRate(
         new exitProgram(), today.getTime(), TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS));
 
-    // Run check for target changes at 7:32am everyday.
+    // Run check for target changes at 6:15am everyday.
     Calendar priceTargetDate = Calendar.getInstance();
     priceTargetDate.set(Calendar.HOUR_OF_DAY, 6);
     priceTargetDate.set(Calendar.MINUTE, 15);
