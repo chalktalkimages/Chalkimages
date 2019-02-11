@@ -1,6 +1,7 @@
 package html;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -16,10 +17,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import adapter.FlowAdapter;
+import adapter.MailRequest;
 import data.Comment;
 import data.CommentDetails;
 import data.GeneralComment;
 import data.TickerResearch;
+import engine.Engine;
 import utils.Globals;
 import utils.SymbolConverter;
 
@@ -72,15 +75,15 @@ public class MobileGeoffMorningReportBuilder {
       logger.info("Error writing html to file: " + e.getMessage() + "\n");
     }
 
-    //    try {
-    //      Utilities.updateEmailRecipients(fullName, "Morning Notes");
-    //    } catch (IOException e) {
-    //      logger.info("Error sending email: " + e.getMessage() + "\n");
-    //    }
-    //
-    //    MailRequest.sendRequest();
-    //
-    //    Engine.getInstance().serverStatus.remove(fullName);
+    try {
+      Utilities.updateEmailRecipients(fullName, "Morning Notes");
+    } catch (IOException e) {
+      logger.info("Error sending email: " + e.getMessage() + "\n");
+    }
+
+    MailRequest.sendRequest();
+
+    Engine.getInstance().serverStatus.remove(fullName);
   }
 
   public static String includeSelectedSections(
