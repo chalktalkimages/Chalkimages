@@ -161,6 +161,14 @@ public class EquityFileParser extends TimerTask {
               logger.error(e);
             }
           }
+          Calendar marketOpen = Calendar.getInstance();
+          marketOpen.set(Calendar.HOUR_OF_DAY, 9);
+          marketOpen.set(Calendar.MINUTE, 30);
+          marketOpen.set(Calendar.SECOND, 0);
+          if (Calendar.getInstance().before(marketOpen)) {
+            logger.info("Getting price target Changes");
+            Engine.getInstance().populatePriceTargetChanges();
+          }
         } else {
           logger.warn("No coverage list file found on SFTP!");
         }

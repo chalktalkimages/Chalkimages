@@ -37,19 +37,18 @@ public class Application {
     today.set(Calendar.MINUTE, nMin);
     today.set(Calendar.SECOND, 0);
     Timer wipeTimer = new Timer();
-    Timer priceTargetChangesTimer = new Timer();
+    //    Timer priceTargetChangesTimer = new Timer();
     wipeTimer.scheduleAtFixedRate(
         new exitProgram(), today.getTime(), TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS));
 
     // Run check for target changes at 6:15am everyday.
-    Calendar priceTargetDate = Calendar.getInstance();
-    priceTargetDate.set(Calendar.HOUR_OF_DAY, 6);
-    priceTargetDate.set(Calendar.MINUTE, 15);
-    priceTargetDate.set(Calendar.SECOND, 0);
-
-    if (Calendar.getInstance().before(priceTargetDate)) {
-      priceTargetChangesTimer.schedule(new TargetChangeProgram(), priceTargetDate.getTime());
-    }
-    logger.info("Populate Target Changes scheduled at " + priceTargetDate.getTime());
+    //    Calendar priceTargetDate = Calendar.getInstance();
+    //    priceTargetDate.set(Calendar.HOUR_OF_DAY, 6);
+    //    priceTargetDate.set(Calendar.MINUTE, 15);
+    //    priceTargetDate.set(Calendar.SECOND, 0);
+    //    if (Calendar.getInstance().before(priceTargetDate)) {
+    //      priceTargetChangesTimer.schedule(new TargetChangeProgram(), priceTargetDate.getTime());
+    //    }
+    //    logger.info("Populate Target Changes scheduled at " + priceTargetDate.getTime());
   }
 }

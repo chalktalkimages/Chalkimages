@@ -36,6 +36,7 @@ import html.GeoffMorningReportBuilder;
 import html.HalftimeReportBuilder;
 import html.MaterialsReportBuilder;
 import html.MiningScoopReportBuilder;
+import html.MobileGeoffMorningReportBuilder;
 import html.MorningReportBuilder;
 import html.ScotiaViewParser;
 import html.Utilities;
@@ -309,6 +310,9 @@ public class Engine {
     } else if (reportType == 10) {
       GeoffMorningReportBuilder.buildReport(
           user.getFullname(), comments, generalComments, reportSections, true);
+    } else if (reportType == 11) {
+      MobileGeoffMorningReportBuilder.buildReport(
+          user.getFullname(), comments, generalComments, reportSections, true);
     }
   }
 
@@ -349,22 +353,45 @@ public class Engine {
     for (Map.Entry<String, String> target : EquityFileParser.currentTargetMap.entrySet()) {
       String ticker = target.getKey();
       String price = target.getValue();
+      // Check if data from database contains ticker, this would mean you need to potentially modify
+      // database
       if (previousTargetMap.containsKey(ticker)) {
-        if (!previousTargetMap.get(ticker).equals(price)) {
-          DBHandle.modifyPriceTarget(ticker, price);
-          logger.info(
-              "Target Price Change, modifying database for ticker: "
-                  + ticker
-                  + " from price "
-                  + previousTargetMap.get(ticker)
-                  + " to "
-                  + price);
-          priceTargetChangesMap.put(ticker, previousTargetMap.get(ticker));
+        if (!previousTargetMap
+            .get(ticker)
+            .equals(price)) { // Check if the database price is the same as current price
+          if (!priceTargetChangesMap.containsKey(ticker)) { // Check if ticker is in changes map
+            DBHandle.modifyPriceTarget(ticker, price);
+            logger.info(
+                "Target Price Change, modifying database for ticker: "
+                    + ticker
+                    + " from price "
+                    + previousTargetMap.get(ticker)
+                    + " to "
+                    + price);
+            priceTargetChangesMap.put(ticker, previousTargetMap.get(ticker));
+          } else { // If ticker exists in change map
+            if (!priceTargetChangesMap
+                .get(ticker)
+                .equals(price)) { // Check if the price is the same, if not, modify
+              DBHandle.modifyPriceTarget(ticker, price);
+              logger.info(
+                  "Target Price Change, modifying database for ticker: "
+                      + ticker
+                      + " from price "
+                      + previousTargetMap.get(ticker)
+                      + " to "
+                      + price);
+              priceTargetChangesMap.put(ticker, previousTargetMap.get(ticker));
+            }
+          }
         }
-      } else {
-        priceTargetChangesMap.put(ticker, price);
-        logger.info("Adding ticker to database: " + ticker + " , " + price);
-        DBHandle.addPriceTarget(ticker, price);
+      } else { // If ticker not in database map, then it needs to be added to the database
+        if (!priceTargetChangesMap.containsKey(
+            ticker)) { // If the change isn't recorded, perform the action, otherwise do nothing
+          priceTargetChangesMap.put(ticker, price);
+          logger.info("Adding ticker to database: " + ticker + " , " + price);
+          DBHandle.addPriceTarget(ticker, price);
+        }
       }
     }
     EquityFileParser.load();
