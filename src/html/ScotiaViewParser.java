@@ -215,7 +215,7 @@ public class ScotiaViewParser {
 
     if (rating.equals("N/A") && target.equals("N/A") && researchLink.equals("")) return null;
     else {
-      HashMap<String, String> tempPriceTargetChangeMap = Engine.getInstance().priceTargetChangesMap;
+      HashMap<String, String> tempPriceTargetChangeMap = Engine.getInstance().historicalPriceTargetChangesMap;
       if (tempPriceTargetChangeMap.containsKey(ticker))
         return new TickerResearch(
             rating, target, researchLink, tempPriceTargetChangeMap.get(ticker));

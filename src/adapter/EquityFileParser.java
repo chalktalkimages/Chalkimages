@@ -68,7 +68,7 @@ public class EquityFileParser extends TimerTask {
       try {
         Map<Integer, String> fileMap = new TreeMap<Integer, String>();
         HashMap<String, String> tempPriceTargetChangeMap =
-            Engine.getInstance().priceTargetChangesMap;
+            Engine.getInstance().historicalPriceTargetChangesMap;
         // Add all filenames on the FTP to the TreeMap
         // The TreeMap sorts values in ascending order
         int i = 0;

@@ -47,7 +47,11 @@ public class Engine {
 
   public ConcurrentHashMap<String, String> serverStatus = new ConcurrentHashMap<String, String>();
 
-  // ticker, historical price in string
+  // ticker, historical price in string, used to store old prices in ticker research in
+  // EquityFileParser
+  public HashMap<String, String> historicalPriceTargetChangesMap = new HashMap<String, String>();
+
+  // tickers that changed target prices, current price in string
   public HashMap<String, String> priceTargetChangesMap = new HashMap<String, String>();
 
   private static final Logger logger = Logger.getLogger(Engine.class.getName());
@@ -368,7 +372,8 @@ public class Engine {
                     + previousTargetMap.get(ticker)
                     + " to "
                     + price);
-            priceTargetChangesMap.put(ticker, previousTargetMap.get(ticker));
+            historicalPriceTargetChangesMap.put(ticker, previousTargetMap.get(ticker));
+            priceTargetChangesMap.put(ticker, price);
           } else { // If ticker exists in change map
             if (!priceTargetChangesMap
                 .get(ticker)
@@ -381,14 +386,15 @@ public class Engine {
                       + previousTargetMap.get(ticker)
                       + " to "
                       + price);
-              priceTargetChangesMap.put(ticker, previousTargetMap.get(ticker));
+              historicalPriceTargetChangesMap.put(ticker, previousTargetMap.get(ticker));
+              priceTargetChangesMap.put(ticker, price);
             }
           }
         }
       } else { // If ticker not in database map, then it needs to be added to the database
-        if (!priceTargetChangesMap.containsKey(
+        if (!historicalPriceTargetChangesMap.containsKey(
             ticker)) { // If the change isn't recorded, perform the action, otherwise do nothing
-          priceTargetChangesMap.put(ticker, price);
+          historicalPriceTargetChangesMap.put(ticker, price);
           logger.info("Adding ticker to database: " + ticker + " , " + price);
           DBHandle.addPriceTarget(ticker, price);
         }
