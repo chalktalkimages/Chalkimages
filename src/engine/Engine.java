@@ -400,7 +400,6 @@ public class Engine {
         }
       }
     }
-    EquityFileParser.load();
   }
 
   public static void main(String[] args) {
