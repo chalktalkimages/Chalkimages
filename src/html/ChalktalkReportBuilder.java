@@ -52,6 +52,12 @@ public class ChalktalkReportBuilder {
       } else {
         Collections.sort(comments, Utilities.getComparatorByTrendScoreAndMustRead());
       }
+    } else {
+      if (!isRanked) {
+        Collections.sort(comments, Utilities.getComparatorByTrendScore());
+      } else {
+        Collections.sort(comments, Utilities.getComparatorByRanking());
+      }
     }
 
     Calendar cal = Calendar.getInstance();
@@ -359,6 +365,12 @@ public class ChalktalkReportBuilder {
       } else {
         Collections.sort(comments, Utilities.getComparatorByTrendScoreAndMustRead());
       }
+    } else {
+      if (!isRanked) {
+        Collections.sort(comments, Utilities.getComparatorByTrendScore());
+      } else {
+        Collections.sort(comments, Utilities.getComparatorByRanking());
+      }
     }
     try {
 
@@ -551,6 +563,12 @@ public class ChalktalkReportBuilder {
         Collections.sort(comments, Utilities.getComparatorByMustReadRanking());
       } else {
         Collections.sort(comments, Utilities.getComparatorByTrendScoreAndMustRead());
+      }
+    } else {
+      if (!isRanked) {
+        Collections.sort(comments, Utilities.getComparatorByTrendScore());
+      } else {
+        Collections.sort(comments, Utilities.getComparatorByRanking());
       }
     }
     Map<String, ArrayList<CommentDetails>> sectorComments =
