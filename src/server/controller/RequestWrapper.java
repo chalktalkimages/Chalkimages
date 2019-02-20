@@ -17,6 +17,7 @@ public class RequestWrapper {
   public Double materialsEVol;
   public ArrayList<GeneralComment> generalComments;
   public ArrayList<String> reportSections;
+  public boolean ranked;
 
   public RequestWrapper() {
     id = 0;
@@ -28,6 +29,7 @@ public class RequestWrapper {
     materialsEVol = (double) 0;
     generalComments = new ArrayList<GeneralComment>();
     reportSections = new ArrayList<String>();
+    ranked = false;
   }
 
   public RequestWrapper(
@@ -39,7 +41,8 @@ public class RequestWrapper {
       Double materialsReturn,
       Double materialsEVol,
       ArrayList<GeneralComment> generalComments,
-      ArrayList<String> reportSections) {
+      ArrayList<String> reportSections,
+      boolean ranked) {
     this.id = id;
     this.user = user;
     this.flow = flow;
@@ -49,5 +52,6 @@ public class RequestWrapper {
     this.materialsEVol = materialsEVol;
     this.generalComments = generalComments;
     this.reportSections = reportSections;
+    this.ranked = ranked;
   }
 }

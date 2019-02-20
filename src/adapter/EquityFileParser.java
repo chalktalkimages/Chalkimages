@@ -162,10 +162,10 @@ public class EquityFileParser extends TimerTask {
             }
           }
           Calendar marketOpen = Calendar.getInstance();
-          marketOpen.set(Calendar.HOUR_OF_DAY, 9);
+          marketOpen.set(Calendar.HOUR_OF_DAY, 10);
           marketOpen.set(Calendar.MINUTE, 30);
           marketOpen.set(Calendar.SECOND, 0);
-          if (Calendar.getInstance().before(marketOpen)) {
+          if (Calendar.getInstance().before(marketOpen) && !DBHandle.getIsHoliday()) {
             logger.info("Getting price target Changes");
             Engine.getInstance().populatePriceTargetChanges();
           }

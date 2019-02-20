@@ -14,6 +14,9 @@ public class CommentDetails {
   public String sentiment;
   public String summary;
   public TickerResearch tickerResearch;
+  public boolean mustRead;
+  public Integer mustReadRanking;
+  public Double trendScore;
 
   public Integer id() {
     return id;
@@ -72,6 +75,9 @@ public class CommentDetails {
     sentiment = "";
     summary = "";
     tickerResearch = null;
+    mustRead = false;
+    mustReadRanking = 0;
+    trendScore = 0.0;
   }
 
   public CommentDetails(

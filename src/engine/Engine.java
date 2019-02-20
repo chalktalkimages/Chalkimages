@@ -265,10 +265,10 @@ public class Engine {
       Double mret,
       Double mvol,
       ArrayList<GeneralComment> generalComments,
-      ArrayList<String> reportSections) {
+      ArrayList<String> reportSections,
+      boolean ranked) {
 
     logger.info("Report build request received from: " + user.firstName + "\n");
-
     if (!serverStatus.containsKey(user.getFullname()))
       serverStatus.put(user.getFullname(), "Initializing Report Build ...");
 
@@ -278,14 +278,17 @@ public class Engine {
       logger.error("Error in editing config file for emailer ...");
     }
 
-    Collections.sort(comments, Utilities.getComparatorByRanking());
-
+    if (!ranked) {
+      Collections.sort(comments, Utilities.getComparatorByTrendScore());
+    } else {
+      Collections.sort(comments, Utilities.getComparatorByRanking());
+    }
     Collections.sort(generalComments, Utilities.getGeneralComparatorByRanking());
 
     if (reportType == 1) // chalk talk
     {
       ChalktalkReportBuilder.buildReport(
-          user.getFullname(), comments, generalComments, reportSections);
+          user.getFullname(), comments, generalComments, reportSections, ranked);
     } else if (reportType == 2) // morning update
     {
       MorningReportBuilder.buildReport(user.getFullname(), comments, eret, evol, mret, mvol);
@@ -316,7 +319,7 @@ public class Engine {
           user.getFullname(), comments, generalComments, reportSections, true);
     } else if (reportType == 11) {
       MobileGeoffMorningReportBuilder.buildReport(
-          user.getFullname(), comments, generalComments, reportSections, true);
+          user.getFullname(), comments, generalComments, reportSections, true, ranked);
     }
   }
 

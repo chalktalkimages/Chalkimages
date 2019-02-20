@@ -25,6 +25,7 @@ public class DBHandle implements Serializable {
 
   public static Map<String, String> nameMap = new HashMap<String, String>();
   public static Map<String, String> historicalTargetPriceMap = new HashMap<String, String>();
+  public static boolean isHoliday = false;
 
   /** SQL QUERIES */
   private static final String SQL_FULL_NAME =
@@ -38,6 +39,9 @@ public class DBHandle implements Serializable {
 
   private static final String SQL_MODIFY_HISTORICAL_PRICE_TARGET =
       "UPDATE [Portfolio].[dbo].[HISTORICAL_PRICE_TARGET] SET price= '%s' WHERE ticker = '%s'";
+
+  private static final String SQL_CHECK_HOLIDAY =
+      "SELECT [date],[isNonTradingHoliday] FROM [SecurityMaster3].[dbo].[Calendar] where date='%s'";
 
   static {
     try {
@@ -74,6 +78,14 @@ public class DBHandle implements Serializable {
         String ticker = rsResultSet.getString(1);
         String price = rsResultSet.getString(2);
         historicalTargetPriceMap.put(ticker, price);
+      }
+
+      logger.info("Checking for Holiday...");
+      String holidaySQL = String.format(SQL_CHECK_HOLIDAY, java.time.LocalDate.now());
+      rsResultSet = stmt.executeQuery(holidaySQL);
+      while (rsResultSet.next()) {
+        boolean holiday = rsResultSet.getBoolean("isNonTradingHoliday");
+        isHoliday = holiday;
       }
     } catch (SQLException sqle) {
       logger.warn("Failed loading historical target prices from SQL!", sqle);
@@ -128,5 +140,9 @@ public class DBHandle implements Serializable {
       logger.warn(s);
     }
     return altRIC;
+  }
+
+  public static boolean getIsHoliday() {
+    return isHoliday;
   }
 }

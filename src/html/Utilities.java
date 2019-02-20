@@ -67,6 +67,7 @@ public class Utilities {
     return new Comparator<CommentDetails>() {
       @Override
       public int compare(CommentDetails comment2, CommentDetails comment1) {
+
         if ((comment2.ranking - comment1.ranking) > 0) return 1;
         else if ((comment2.ranking - comment1.ranking) < 0) return -1;
         else {
@@ -77,6 +78,52 @@ public class Utilities {
             return 0;
           }
         }
+      }
+    };
+  }
+
+  public static Comparator<CommentDetails> getComparatorByMustReadRanking() {
+    return new Comparator<CommentDetails>() {
+      @Override
+      public int compare(CommentDetails comment2, CommentDetails comment1) {
+        if ((comment2.mustReadRanking - comment1.mustReadRanking) > 0) return 1;
+        else if ((comment2.mustReadRanking - comment1.mustReadRanking) < 0) return -1;
+        else {
+          if ((comment2.ranking - comment1.ranking) > 0) return 1;
+          else if ((comment2.ranking - comment1.ranking) < 0) return -1;
+          else {
+            if (comment2.belongsTo() == null || comment1.belongsTo() == null) return 0;
+            if ((comment2.belongsTo().compareTo(comment1.belongsTo())) > 0) return 1;
+            else if ((comment2.belongsTo().compareTo(comment1.belongsTo())) < 0) return -1;
+            else {
+              return 0;
+            }
+          }
+        }
+      }
+    };
+  }
+
+  public static Comparator<CommentDetails> getComparatorByTrendScore() {
+    return new Comparator<CommentDetails>() {
+      @Override
+      public int compare(CommentDetails comment2, CommentDetails comment1) {
+        return comment1.trendScore.compareTo(comment2.trendScore);
+      }
+    };
+  }
+
+  public static Comparator<CommentDetails> getComparatorByTrendScoreAndMustRead() {
+    return new Comparator<CommentDetails>() {
+      @Override
+      public int compare(CommentDetails comment2, CommentDetails comment1) {
+        int iComp = comment2.mustReadRanking.compareTo(comment1.mustReadRanking);
+
+        if (iComp != 0) {
+          return iComp;
+        }
+
+        return comment1.trendScore.compareTo(comment2.trendScore);
       }
     };
   }
@@ -181,6 +228,15 @@ public class Utilities {
         return "<font color=\"#C0392B\">" + comment.sentiment() + "</font>";
       else return "<font color=\"#000000\">" + comment.sentiment() + "</font>";
     } else return "";
+  }
+
+  public static boolean checkMustRead(ArrayList<CommentDetails> comments) {
+    for (CommentDetails comment : comments) {
+      if (comment.mustRead) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public static String parseQuoteComment(String comment, boolean isAndrewMoffatt, boolean isChalk) {

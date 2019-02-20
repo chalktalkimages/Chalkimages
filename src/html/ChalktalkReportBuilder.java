@@ -30,13 +30,29 @@ public class ChalktalkReportBuilder {
 
   private static String name = "";
 
+  private static boolean mustRead = false;
+
+  private static boolean isRanked = false;
+
   public static void buildReport(
       String fullName,
       ArrayList<CommentDetails> comments,
       ArrayList<GeneralComment> generalComments,
-      ArrayList<String> reportSections) {
+      ArrayList<String> reportSections,
+      boolean ranked) {
 
     name = fullName;
+    mustRead =
+        Utilities.sectionIncluded(reportSections, "Must Read") && Utilities.checkMustRead(comments);
+    isRanked = ranked;
+
+    if (mustRead) {
+      if (isRanked) {
+        Collections.sort(comments, Utilities.getComparatorByMustReadRanking());
+      } else {
+        Collections.sort(comments, Utilities.getComparatorByTrendScoreAndMustRead());
+      }
+    }
 
     Calendar cal = Calendar.getInstance();
     // SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
@@ -76,6 +92,7 @@ public class ChalktalkReportBuilder {
     String bellComments = buildBellComments(bellmacroindexcomments);
     String macroComments = buildMacroComments(generalComments);
     String indexComments = buildIndexComments(bellmacroindexcomments);
+    String mustRead = getMustRead(comments, reportSections);
     ArrayList<String> shortLongComments =
         buildChalktalkSymbolComments(
             comments,
@@ -104,6 +121,7 @@ public class ChalktalkReportBuilder {
             .replace("{{bellComments}}", bellComments)
             .replace("{{highlightComments}}", highlightComments)
             .replace("{{symbolComments}}", symbolComments)
+            .replace("{{MustReadSymbolComments}}", mustRead)
             .replace("{{emailSignature}}", htmlSignature)
             .replace("{{macroComments}}", macroComments)
             .replace("{{indexComments}}", indexComments)
@@ -208,6 +226,13 @@ public class ChalktalkReportBuilder {
     } else {
       body = body.replace("{{CanadianMA}}", Utilities.getHTMLString("CanadianMA.html"));
     }
+
+    if (!mustRead) {
+      body = body.replace("{{MustRead}}", "");
+    } else {
+      body = body.replace("{{MustRead}}", Utilities.getHTMLString("MustReadNamesNews.html"));
+    }
+
     return body;
   }
 
@@ -328,8 +353,13 @@ public class ChalktalkReportBuilder {
     String symbolComment = Utilities.getHTMLString("ChalktalkSymbolComment.html");
     String highlightComment = Utilities.getHTMLString("highlightComment.html");
     ScotiaViewParser parser = new ScotiaViewParser();
-    Collections.sort(comments, Utilities.getComparatorByRanking());
-
+    if (mustRead) {
+      if (isRanked) {
+        Collections.sort(comments, Utilities.getComparatorByMustReadRanking());
+      } else {
+        Collections.sort(comments, Utilities.getComparatorByTrendScoreAndMustRead());
+      }
+    }
     try {
 
       if (includeDetailedComment) {
@@ -474,6 +504,23 @@ public class ChalktalkReportBuilder {
     return result;
   }
 
+  public static String getMustRead(
+      ArrayList<CommentDetails> comments, ArrayList<String> reportSections) {
+    ArrayList<CommentDetails> mustReadComment = new ArrayList<>();
+    for (CommentDetails comment : comments) {
+      if (comment.mustRead) {
+        mustReadComment.add(comment);
+      }
+    }
+    ArrayList<String> symbolComments =
+        buildChalktalkSymbolComments(
+            mustReadComment,
+            Utilities.sectionIncluded(reportSections, "Research Highlights"),
+            Utilities.sectionIncluded(reportSections, "Names in the News"));
+
+    return symbolComments.get(0);
+  }
+
   public static String getSectorNameInNews(
       ArrayList<CommentDetails> comments, ArrayList<String> reportSections) {
     String result = "";
@@ -499,11 +546,20 @@ public class ChalktalkReportBuilder {
 
   public static Map<String, ArrayList<CommentDetails>> getSectorCommentMap(
       ArrayList<CommentDetails> comments) {
-    Collections.sort(comments, Utilities.getComparatorByRanking());
+    if (mustRead) {
+      if (isRanked) {
+        Collections.sort(comments, Utilities.getComparatorByMustReadRanking());
+      } else {
+        Collections.sort(comments, Utilities.getComparatorByTrendScoreAndMustRead());
+      }
+    }
     Map<String, ArrayList<CommentDetails>> sectorComments =
         new LinkedHashMap<String, ArrayList<CommentDetails>>();
     for (int i = 0; i < comments.size(); i++) {
       CommentDetails comment = comments.get(i);
+      if (mustRead) {
+        if (comment.mustRead) continue;
+      }
       String sector = comment.sector();
       ArrayList<CommentDetails> currSectorComments;
       if (sectorComments.get(sector) == null) {

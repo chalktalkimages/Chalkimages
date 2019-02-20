@@ -30,15 +30,31 @@ public class MobileGeoffMorningReportBuilder {
   private static final Logger logger = Logger.getLogger(ChalktalkReportBuilder.class.getName());
   private static String name = "";
   private static boolean titlesOnlyReport = false;
+  private static boolean mustRead = false;
+
+  private static boolean isRanked = false;
 
   public static void buildReport(
       String fullName,
       ArrayList<CommentDetails> comments,
       ArrayList<GeneralComment> generalComments,
       ArrayList<String> reportSections,
-      boolean titlesOnly) {
+      boolean titlesOnly,
+      boolean ranked) {
     titlesOnlyReport = titlesOnly;
     name = fullName;
+    mustRead =
+        Utilities.sectionIncluded(reportSections, "Must Read") && Utilities.checkMustRead(comments);
+    isRanked = ranked;
+
+    if (mustRead) {
+      if (isRanked) {
+        Collections.sort(comments, Utilities.getComparatorByMustReadRanking());
+      } else {
+        Collections.sort(comments, Utilities.getComparatorByTrendScoreAndMustRead());
+      }
+    }
+
     ArrayList<Comment> bellmacroindexcomments = FlowAdapter.getComments();
     String macroComments = getMacroComments(generalComments);
     String fileSave = "ChalkTalkEmail.html";
@@ -51,6 +67,7 @@ public class MobileGeoffMorningReportBuilder {
     String buyList = getIOItradelist("buy");
     String sellList = getIOItradelist("sell");
     String morningIndications = getMorningIndications(buyList, sellList);
+    String mustRead = getMustRead(comments, Utilities.sectionIncluded(reportSections, "Must Read"));
     String indexComments = buildIndexComments(bellmacroindexcomments);
     body = includeSelectedSections(reportSections, body, bellmacroindexcomments);
 
@@ -63,6 +80,7 @@ public class MobileGeoffMorningReportBuilder {
                 getNotableNews(
                     comments, Utilities.sectionIncluded(reportSections, "Names in the News")))
             .replace("{{indexComments}}", indexComments)
+            .replace("{{MustReadSymbolComments}}", mustRead)
             .replace("{{emailSignature}}", htmlSignature);
 
     body = Utilities.replaceOddCharacters(body);
@@ -110,6 +128,14 @@ public class MobileGeoffMorningReportBuilder {
     } else {
       body =
           body.replace("{{NamesInTheNews}}", Utilities.getHTMLString("MobileGeoffNamesNews.html"));
+    }
+
+    if (!mustRead) {
+      body = body.replace("{{MustRead}}", "");
+    } else {
+      body =
+          body.replace(
+              "{{MustRead}}", Utilities.getHTMLString("MobileGeoffMustReadNamesNews.html"));
     }
 
     if (!Utilities.sectionIncluded(reportSections, "Index Events")) {
@@ -226,7 +252,6 @@ public class MobileGeoffMorningReportBuilder {
       ArrayList<CommentDetails> comments, boolean includeDetailedComment) {
     String result = "";
     String temp = "";
-    Collections.sort(comments, Utilities.getComparatorByRanking());
     String symbolComment = Utilities.getHTMLString("MobileGeoffSymbolComment.html");
     ScotiaViewParser parser = new ScotiaViewParser();
 
@@ -329,13 +354,28 @@ public class MobileGeoffMorningReportBuilder {
     return result;
   }
 
+  public static String getMustRead(
+      ArrayList<CommentDetails> comments, boolean includeDetailedComment) {
+    ArrayList<CommentDetails> mustReadComment = new ArrayList<>();
+    for (CommentDetails comment : comments) {
+      if (comment.mustRead) {
+        mustReadComment.add(comment);
+      }
+    }
+    String symbolComments = getSymbolComments(mustReadComment, includeDetailedComment);
+
+    return symbolComments;
+  }
+
   public static Map<String, ArrayList<CommentDetails>> getSectorCommentMap(
       ArrayList<CommentDetails> comments) {
     Map<String, ArrayList<CommentDetails>> sectorComments =
         new LinkedHashMap<String, ArrayList<CommentDetails>>();
-    Collections.sort(comments, Utilities.getComparatorByRanking());
     for (int i = 0; i < comments.size(); i++) {
       CommentDetails comment = comments.get(i);
+      if (mustRead) {
+        if (comment.mustRead) continue;
+      }
       String sector = comment.sector();
       ArrayList<CommentDetails> currSectorComments;
       if (sectorComments.get(sector) == null) {
