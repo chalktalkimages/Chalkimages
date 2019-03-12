@@ -31,6 +31,7 @@ public class MobileGeoffMorningReportBuilder {
   private static String name = "";
   private static boolean titlesOnlyReport = false;
   private static boolean mustRead = false;
+  private static String commentType = "";
 
   private static boolean isRanked = false;
 
@@ -40,12 +41,14 @@ public class MobileGeoffMorningReportBuilder {
       ArrayList<GeneralComment> generalComments,
       ArrayList<String> reportSections,
       boolean titlesOnly,
-      boolean ranked) {
+      boolean ranked,
+      String type) {
     titlesOnlyReport = titlesOnly;
     name = fullName;
     mustRead =
         Utilities.sectionIncluded(reportSections, "Must Read") && Utilities.checkMustRead(comments);
     isRanked = ranked;
+    commentType = type;
 
     if (mustRead) {
       if (isRanked) {
@@ -286,11 +289,20 @@ public class MobileGeoffMorningReportBuilder {
               research.previousTarget = research.previousTarget.replace(".00", "");
             }
             if (titlesOnlyReport) {
-              temp =
-                  temp.replace(
-                      "{{body}}",
-                      Utilities.formatGeoffSentiment(comment)
-                          + Utilities.parseQuoteComment(comment.summary(), false, true));
+              if (commentType.equals("")) {
+                temp =
+                    temp.replace(
+                        "{{body}}",
+                        Utilities.formatGeoffSentiment(comment)
+                            + Utilities.parseQuoteComment(comment.summary(), false, true));
+              } else {
+                temp =
+                    temp.replace(
+                        "{{body}}",
+                        Utilities.formatGeoffSentiment(comment)
+                            + Utilities.parseQuoteComment(
+                                formatComment(commentType, comment), false, true));
+              }
               if (comments.size() == 2) {
                 if (comments.indexOf(comment) == 0) {
                   temp =
@@ -426,5 +438,25 @@ public class MobileGeoffMorningReportBuilder {
       firstLetters += s.charAt(0);
     }
     return firstLetters;
+  }
+
+  public static String formatComment(String type, CommentDetails comment) {
+    logger.info(type);
+    String newComment = "";
+    if (type.equals("Summary Only")) {
+      String summary = comment.summary().trim();
+      newComment = summary;
+    } else if (type.equals("Summary + Detail")) {
+      String summary = comment.summary().trim();
+      String details = comment.body().trim();
+      newComment = summary + " " + details;
+
+    } else if (type.equals("Full Comment")) {
+      String summary = comment.summary().trim();
+      String details = comment.body().trim();
+      String valuation = comment.valuation().trim();
+      newComment = summary + " " + details + " " + valuation;
+    }
+    return newComment;
   }
 }

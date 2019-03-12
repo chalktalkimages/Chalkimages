@@ -95,6 +95,7 @@ public class EquityFileParser extends TimerTask {
             CSVRecord record = fileIterator.next();
             String headline = record.get(6);
             headline = headline.replace("’", "'");
+            headline = headline.replaceAll("–", "-");
             if (storyCounter.containsKey(headline)) {
               storyCounter.put(headline, storyCounter.get(headline).intValue() + 1);
             } else {
@@ -120,6 +121,7 @@ public class EquityFileParser extends TimerTask {
               String researchLink = record.get(5);
               String headline = record.get(6);
               headline = headline.replace("’", "'");
+              headline = headline.replaceAll("–", "-");
 
               SimpleDateFormat dateFormatter = new SimpleDateFormat("M/dd/yyyy hh:mm:ss a");
               Calendar publishDate = Calendar.getInstance();

@@ -6,6 +6,7 @@ public class CommentDetails {
   public String RIC;
   public String belongsTo;
   public String body;
+  public String valuation;
   public Integer ranking;
   public Double returns;
   public Double excessVol;
@@ -60,6 +61,10 @@ public class CommentDetails {
 
   public String summary() {
     return summary;
+  }
+
+  public String valuation() {
+    return valuation;
   }
 
   public CommentDetails() {

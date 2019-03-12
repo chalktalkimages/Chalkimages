@@ -59,7 +59,8 @@ public class ChalktalkController {
             wrapper.materialsEVol,
             wrapper.generalComments,
             wrapper.reportSections,
-            wrapper.ranked);
+            wrapper.ranked,
+            wrapper.type);
   }
 
   @RequestMapping(

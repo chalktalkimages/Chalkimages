@@ -1,9 +1,9 @@
 to=
-from=george.gardiner@scotiabank.com
-subject=Analyst/Trader Block Trade Report
+from=puneet.kaur@scotiabank.com
+subject=Scotiabank Chalk Talk
 imageLoc=\\t65-w7-eqcash\incoming\ChalkServer\htmlBuild\images
 images=
 
 
-body=\\t65-w7-eqcash\incoming\ChalkServer\htmlBuild\BlockReportEmail.html
+body=\\t65-w7-eqcash\incoming\ChalkServer\htmlBuild\ChalkTalkEmail.html
 bcc=

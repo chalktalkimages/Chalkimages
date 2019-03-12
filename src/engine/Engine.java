@@ -266,7 +266,10 @@ public class Engine {
       Double mvol,
       ArrayList<GeneralComment> generalComments,
       ArrayList<String> reportSections,
-      boolean ranked) {
+      boolean ranked,
+      String type) {
+
+    logger.info(type);
 
     logger.info("Report build request received from: " + user.firstName + "\n");
     if (!serverStatus.containsKey(user.getFullname()))
@@ -288,7 +291,7 @@ public class Engine {
     if (reportType == 1) // chalk talk
     {
       ChalktalkReportBuilder.buildReport(
-          user.getFullname(), comments, generalComments, reportSections, ranked);
+          user.getFullname(), comments, generalComments, reportSections, ranked, type);
     } else if (reportType == 2) // morning update
     {
       MorningReportBuilder.buildReport(user.getFullname(), comments, eret, evol, mret, mvol);
@@ -319,7 +322,13 @@ public class Engine {
           user.getFullname(), comments, generalComments, reportSections, true);
     } else if (reportType == 11) {
       MobileGeoffMorningReportBuilder.buildReport(
-          user.getFullname(), comments, generalComments, reportSections, true, ranked);
+          user.getFullname(), comments, generalComments, reportSections, true, ranked, type);
+    } else if (reportType == 12) {
+      MobileGeoffMorningReportBuilder.buildReport(
+          user.getFullname(), comments, generalComments, reportSections, true, ranked, type);
+    } else if (reportType == 13) {
+      ChalktalkReportBuilder.buildReport(
+          user.getFullname(), comments, generalComments, reportSections, ranked, type);
     }
   }
 

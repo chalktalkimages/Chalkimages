@@ -34,17 +34,21 @@ public class ChalktalkReportBuilder {
 
   private static boolean isRanked = false;
 
+  private static String commentType = "";
+
   public static void buildReport(
       String fullName,
       ArrayList<CommentDetails> comments,
       ArrayList<GeneralComment> generalComments,
       ArrayList<String> reportSections,
-      boolean ranked) {
+      boolean ranked,
+      String type) {
 
     name = fullName;
     mustRead =
         Utilities.sectionIncluded(reportSections, "Must Read") && Utilities.checkMustRead(comments);
     isRanked = ranked;
+    commentType = type;
 
     if (mustRead) {
       if (isRanked) {
@@ -390,19 +394,36 @@ public class ChalktalkReportBuilder {
               research = parser.getSymbolResearch(comment.belongsTo(), ticker);
             }
 
-            temp =
-                temp.replace("{{belongsTo}}", ticker)
-                    .replace(
-                        "{{body}}",
-                        Utilities.formatSentiment(comment)
-                            + Utilities.parseQuoteComment(comment.body(), false, true))
-                    .replace("{{rating}}", research.rating)
-                    .replace(
-                        "{{target}}",
-                        research.target.indexOf("$") == -1
-                            ? "$" + research.target
-                            : research.target)
-                    .replace("{{researchLink}}", research.researchLink);
+            if (commentType.equals("")) {
+              temp =
+                  temp.replace("{{belongsTo}}", ticker)
+                      .replace(
+                          "{{body}}",
+                          Utilities.formatSentiment(comment)
+                              + Utilities.parseQuoteComment(comment.body(), false, true))
+                      .replace("{{rating}}", research.rating)
+                      .replace(
+                          "{{target}}",
+                          research.target.indexOf("$") == -1
+                              ? "$" + research.target
+                              : research.target)
+                      .replace("{{researchLink}}", research.researchLink);
+            } else {
+              temp =
+                  temp.replace("{{belongsTo}}", ticker)
+                      .replace(
+                          "{{body}}",
+                          Utilities.formatSentiment(comment)
+                              + Utilities.parseQuoteComment(
+                                  formatComment(commentType, comment), false, true))
+                      .replace("{{rating}}", research.rating)
+                      .replace(
+                          "{{target}}",
+                          research.target.indexOf("$") == -1
+                              ? "$" + research.target
+                              : research.target)
+                      .replace("{{researchLink}}", research.researchLink);
+            }
             if (includeHighlights) {
               temp =
                   temp.replace(
@@ -589,6 +610,25 @@ public class ChalktalkReportBuilder {
       sectorComments.put(sector, currSectorComments);
     }
     return sectorComments;
+  }
+
+  public static String formatComment(String type, CommentDetails comment) {
+    String newComment = "";
+    if (type.equals("Summary Only")) {
+      String summary = comment.summary().trim();
+      newComment = summary;
+    } else if (type.equals("Summary + Detai")) {
+      String summary = comment.summary().trim();
+      String details = comment.body().trim();
+      newComment = summary + " " + details;
+
+    } else if (type.equals("Full Comment")) {
+      String summary = comment.summary().trim();
+      String details = comment.body().trim();
+      String valuation = comment.valuation().trim();
+      newComment = summary + " " + details + " " + valuation;
+    }
+    return newComment;
   }
 
   public static void main(String[] args) throws IOException, InterruptedException, SQLException {}
