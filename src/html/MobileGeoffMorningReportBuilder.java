@@ -451,7 +451,7 @@ public class MobileGeoffMorningReportBuilder {
       String details = comment.body().trim();
       newComment = summary + " " + details;
 
-    } else if (type.equals("Full Comment")) {
+    } else if (type.equals("Full Comments")) {
       String summary = comment.summary().trim();
       String details = comment.body().trim();
       String valuation = comment.valuation().trim();

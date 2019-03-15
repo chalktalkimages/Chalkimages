@@ -617,12 +617,12 @@ public class ChalktalkReportBuilder {
     if (type.equals("Summary Only")) {
       String summary = comment.summary().trim();
       newComment = summary;
-    } else if (type.equals("Summary + Detai")) {
+    } else if (type.equals("Summary + Detail")) {
       String summary = comment.summary().trim();
       String details = comment.body().trim();
       newComment = summary + " " + details;
 
-    } else if (type.equals("Full Comment")) {
+    } else if (type.equals("Full Comments")) {
       String summary = comment.summary().trim();
       String details = comment.body().trim();
       String valuation = comment.valuation().trim();
